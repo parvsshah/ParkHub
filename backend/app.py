@@ -870,22 +870,36 @@ def get_analytics_overview():
 # STATIC FILE SERVING (FRONTEND)
 # ============================================
 
+FRIENDLY_PAGE_ROUTES = {
+    'login': 'login.html',
+    'register': 'register.html',
+    'dashboard': 'dashboard.html',
+    'profile': 'profile.html',
+    'booking-confirmation': 'booking-confirmation.html',
+    'admin-login': 'admin-login.html',
+    'admin-dashboard': 'admin-dashboard.html',
+    '': 'index.html'
+}
+
 @app.route('/', methods=['GET'])
 def root():
     """Serve frontend index.html"""
     return send_from_directory(FRONTEND_DIR, 'index.html')
 
-@app.route('/<path:filename>', methods=['GET'])
-def serve_static(filename):
-    """Serve static files from frontend directory"""
-    file_path = FRONTEND_DIR / filename
-    print(f"Serving static: {filename}, path: {file_path}, exists: {file_path.exists()}")
+@app.route('/<path:page>', methods=['GET'])
+def serve_page(page):
+    """Serve friendly frontend pages or static assets"""
+    if page in FRIENDLY_PAGE_ROUTES:
+        return send_from_directory(FRONTEND_DIR, FRIENDLY_PAGE_ROUTES[page])
+
+    file_path = FRONTEND_DIR / page
     if file_path.exists() and file_path.is_file():
-        return send_from_directory(FRONTEND_DIR, filename)
+        return send_from_directory(FRONTEND_DIR, page)
+
     # If file doesn't exist and doesn't look like an API call, serve index.html
-    if not filename.startswith('api/'):
-        print(f"File not found, serving index.html for {filename}")
+    if not page.startswith('api/'):
         return send_from_directory(FRONTEND_DIR, 'index.html')
+
     return jsonify({'error': 'Not found'}), 404
 
 @app.route('/health', methods=['GET'])
