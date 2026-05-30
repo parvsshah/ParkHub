@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 import psycopg2
 import bcrypt
 from pathlib import Path
@@ -6,9 +7,7 @@ from pathlib import Path
 def hash_password(password):
     return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
-config = {
-    'DATABASE_URL': 'postgresql://neondb_owner:npg_8stLa3kcZVMe@ep-muddy-bar-ad912ml9-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require'
-}
+config = {}
 
 env_file = Path('.env')
 if env_file.exists():
@@ -18,6 +17,12 @@ if env_file.exists():
             if line and not line.startswith('#') and '=' in line:
                 key, val = line.split('=', 1)
                 config[key.strip()] = val.strip()
+
+if 'DATABASE_URL' not in config:
+    config['DATABASE_URL'] = os.environ.get('DATABASE_URL')
+
+if not config.get('DATABASE_URL'):
+    raise RuntimeError('DATABASE_URL must be set in .env or environment variables')
 
 conn = psycopg2.connect(config['DATABASE_URL'])
 cursor = conn.cursor()

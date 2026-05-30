@@ -10,9 +10,7 @@ from pathlib import Path
 def load_env():
     """Load environment variables from .env file"""
     env_file = Path(__file__).parent.parent / '.env'
-    config = {
-        'DATABASE_URL': 'postgresql://neondb_owner:npg_8stLa3kcZVMe@ep-muddy-bar-ad912ml9-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require'
-    }
+    config = {}
     
     if env_file.exists():
         with open(env_file) as f:
@@ -21,6 +19,12 @@ def load_env():
                 if line and not line.startswith('#') and '=' in line:
                     key, value = line.split('=', 1)
                     config[key.strip()] = value.strip()
+
+    if 'DATABASE_URL' not in config:
+        config['DATABASE_URL'] = os.environ.get('DATABASE_URL')
+
+    if not config.get('DATABASE_URL'):
+        raise RuntimeError('DATABASE_URL must be set in .env or environment variables')
     
     return config
 
