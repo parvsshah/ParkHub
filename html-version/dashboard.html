@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - ParkHub</title>
+    <meta name="description" content="Find and book parking spots">
+    <link rel="stylesheet" href="styles/global.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <style>
+        body {
+            background: linear-gradient(150deg, hsl(172 30% 97%) 0%, hsl(220 20% 96%) 100%);
+            min-height: 100vh;
+        }
+
+        /* ── Dashboard Nav ── */
+        .dashboard-header {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid hsl(var(--border));
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            width: 100%;
+        }
+
+        .dashboard-nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-lg) var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .dashboard-logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-bold);
+            color: hsl(var(--foreground));
+            text-decoration: none;
+            letter-spacing: -0.02em;
+        }
+
+        .dashboard-user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            color: hsl(var(--foreground));
+            font-weight: var(--font-weight-medium);
+        }
+
+        .dashboard-main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-xl);
+        }
+
+        .dashboard-tabs {
+            display: flex;
+            background: hsl(var(--muted));
+            border-radius: var(--radius-lg);
+            padding: 0.35rem;
+            margin-bottom: var(--space-xl);
+            box-shadow: inset 0 1px 3px hsl(220 20% 18% / 0.06);
+            gap: 0.25rem;
+        }
+
+        .dashboard-tab {
+            flex: 1;
+            padding: 0.65rem var(--space-md);
+            border: none;
+            background: transparent;
+            border-radius: var(--radius);
+            font-weight: var(--font-weight-semibold);
+            font-size: var(--font-size-sm);
+            color: hsl(var(--muted-foreground));
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-sm);
+            white-space: nowrap;
+        }
+
+        .dashboard-tab:hover {
+            color: hsl(var(--foreground));
+            background: hsl(var(--secondary));
+        }
+
+        .dashboard-tab.active {
+            background: hsl(var(--background));
+            color: hsl(var(--primary));
+            box-shadow: 0 2px 8px hsl(220 20% 18% / 0.10), 0 1px 3px hsl(220 20% 18% / 0.06);
+            font-weight: var(--font-weight-bold);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .search-section {
+            background: hsl(var(--background));
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-xl);
+            box-shadow: 0 4px 20px hsl(220 20% 18% / 0.07), 0 1px 4px hsl(220 20% 18% / 0.04);
+            border: 1px solid hsl(var(--border));
+        }
+
+        .search-title {
+            font-size: var(--font-size-2xl);
+            font-weight: var(--font-weight-bold);
+            color: hsl(var(--foreground));
+            margin-bottom: var(--space-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .search-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: var(--space-lg);
+            margin-bottom: var(--space-xl);
+            align-items: end;
+        }
+
+        .search-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+
+        .search-label {
+            font-weight: var(--font-weight-medium);
+            color: hsl(var(--foreground));
+            font-size: var(--font-size-sm);
+        }
+
+        .search-input {
+            padding: 0.7rem var(--space-md);
+            border: 1.5px solid hsl(var(--border));
+            border-radius: var(--radius);
+            font-size: var(--font-size-sm);
+            transition: all var(--transition-fast);
+            background: hsl(var(--input));
+            font-family: 'Inter', sans-serif;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: hsl(var(--primary));
+            box-shadow: 0 0 0 3px hsl(var(--primary) / 0.12);
+            background: white;
+        }
+
+        .search-button {
+            padding: 0.7rem var(--space-xl);
+            background: linear-gradient(135deg, hsl(var(--primary)), hsl(172 38% 38%));
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: var(--font-weight-semibold);
+            font-size: var(--font-size-sm);
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            box-shadow: 0 4px 14px hsl(var(--primary) / 0.30);
+            white-space: nowrap;
+        }
+
+        .search-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px hsl(var(--primary) / 0.38);
+        }
+
+        .results-section {
+            margin-top: var(--space-xl);
+        }
+
+        .results-title {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-bold);
+            color: hsl(var(--foreground));
+            margin-bottom: var(--space-lg);
+        }
+
+        .parking-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: var(--space-lg);
+        }
+
+        .parking-card {
+            background: hsl(var(--background));
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            box-shadow: 0 4px 16px hsl(220 20% 18% / 0.07), 0 1px 4px hsl(220 20% 18% / 0.04);
+            border: 1px solid hsl(var(--border));
+            transition: all var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .parking-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 16px 40px hsl(220 20% 18% / 0.12), 0 4px 12px hsl(220 20% 18% / 0.07);
+            border-color: hsl(var(--border-hover));
+        }
+
+        .parking-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, hsl(var(--primary)), hsl(172 50% 65%));
+        }
+
+        .parking-name {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-bold);
+            color: hsl(var(--foreground));
+            margin-bottom: var(--space-sm);
+        }
+
+        .parking-location {
+            color: hsl(var(--muted-foreground));
+            font-size: var(--font-size-sm);
+            margin-bottom: var(--space-md);
+        }
+
+        .parking-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-md);
+            margin-bottom: var(--space-lg);
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-xs);
+            text-align: center;
+            padding: var(--space-md);
+            background: hsl(var(--muted));
+            border-radius: var(--radius);
+            border: 1px solid hsl(var(--border));
+        }
+
+        .detail-label {
+            font-size: 0.65rem;
+            color: hsl(var(--muted-foreground));
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-weight: var(--font-weight-bold);
+        }
+
+        .detail-value {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-extrabold);
+            color: hsl(var(--primary));
+            letter-spacing: -0.02em;
+        }
+
+        .parking-actions {
+            display: flex;
+            gap: var(--space-sm);
+        }
+
+        .btn-outline {
+            flex: 1;
+            padding: var(--space-sm) var(--space-md);
+            border: 2px solid hsl(var(--primary));
+            background: transparent;
+            color: hsl(var(--primary));
+            border-radius: var(--radius);
+            font-weight: var(--font-weight-medium);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .btn-outline:hover {
+            background: hsl(var(--primary));
+            color: hsl(var(--primary-foreground));
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: var(--space-3xl);
+            color: hsl(var(--muted-foreground));
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: var(--space-lg);
+            opacity: 0.5;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-lg);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: hsl(var(--background));
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            max-width: 550px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border: 1px solid hsl(var(--border));
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-xl);
+            padding-bottom: var(--space-lg);
+            border-bottom: 2px solid hsl(var(--border));
+        }
+
+        .modal-title {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-bold);
+            color: hsl(var(--foreground));
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: var(--font-size-xl);
+            cursor: pointer;
+            color: hsl(var(--muted-foreground));
+            padding: var(--space-xs);
+            border-radius: var(--radius-sm);
+            transition: all var(--transition-fast);
+        }
+
+        .modal-close:hover {
+            background: hsl(var(--muted));
+            color: hsl(var(--foreground));
+        }
+
+        .booking-summary {
+            background: linear-gradient(135deg, hsl(172 40% 97%), hsl(220 20% 97%));
+            padding: var(--space-lg);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--space-xl);
+            border: 1.5px solid hsl(var(--primary) / 0.2);
+        }
+
+        .summary-title {
+            font-weight: var(--font-weight-semibold);
+            color: hsl(var(--foreground));
+            margin-bottom: var(--space-md);
+            font-size: var(--font-size-base);
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid hsl(var(--border));
+            font-size: var(--font-size-sm);
+        }
+
+        .summary-row:last-child {
+            border-bottom: none;
+            font-weight: var(--font-weight-bold);
+            font-size: var(--font-size-lg);
+            color: hsl(var(--primary));
+            padding-top: var(--space-md);
+            margin-top: var(--space-md);
+            border-top: 2px solid hsl(var(--border));
+        }
+
+        .payment-methods {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+            margin-bottom: var(--space-xl);
+        }
+
+        .payment-option {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            padding: var(--space-lg);
+            border: 2px solid hsl(var(--border));
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            background: hsl(var(--background));
+        }
+
+        .payment-option:hover {
+            border-color: hsl(var(--primary));
+            background: hsl(var(--primary) / 0.02);
+        }
+
+        .payment-option.selected {
+            border-color: hsl(var(--primary));
+            background: hsl(var(--primary) / 0.08);
+            box-shadow: 0 0 0 1px hsl(var(--primary));
+        }
+
+        .payment-option input {
+            width: 18px;
+            height: 18px;
+            accent-color: hsl(var(--primary));
+            cursor: pointer;
+        }
+
+        .spot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+            gap: var(--space-sm);
+            max-height: 400px;
+            overflow-y: auto;
+            padding: var(--space-lg);
+            background: hsl(var(--muted) / 0.3);
+            border-radius: var(--radius);
+            margin-bottom: var(--space-lg);
+        }
+
+        .spot-item {
+            aspect-ratio: 1;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            position: relative;
+        }
+
+        .spot-available {
+            background: linear-gradient(135deg, hsl(var(--success)), hsl(150 44% 38%));
+            color: white;
+            font-size: var(--font-size-xs);
+            box-shadow: 0 2px 6px hsl(var(--success) / 0.3);
+        }
+
+        .spot-available:hover {
+            transform: scale(1.15);
+            box-shadow: 0 6px 16px hsl(var(--success) / 0.4);
+        }
+
+        .spot-occupied {
+            background: hsl(220 15% 88%);
+            color: hsl(var(--muted-foreground));
+            cursor: not-allowed;
+        }
+
+        .spot-legend {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-xl);
+            font-size: var(--font-size-sm);
+            color: hsl(var(--muted-foreground));
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: var(--radius-sm);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-lg);
+        }
+
+        .form-label {
+            font-weight: var(--font-weight-medium);
+            color: hsl(var(--foreground));
+            font-size: var(--font-size-sm);
+        }
+
+        .form-input,
+        .form-select {
+            padding: var(--space-md) var(--space-lg);
+            border: 2px solid hsl(var(--border));
+            border-radius: var(--radius);
+            font-size: var(--font-size-base);
+            transition: all var(--transition-fast);
+            background: hsl(var(--background));
+            color: hsl(var(--foreground));
+            font-family: inherit;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: hsl(var(--primary));
+            box-shadow: 0 0 0 3px hsl(var(--primary-light));
+        }
+
+        .btn {
+            padding: var(--space-md) var(--space-lg);
+            border: none;
+            border-radius: var(--radius);
+            font-weight: var(--font-weight-semibold);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-sm);
+        }
+
+        .btn-primary {
+            background: hsl(var(--primary));
+            color: hsl(var(--primary-foreground));
+            box-shadow: 0 2px 8px hsl(var(--shadow));
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: hsl(var(--primary-hover));
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px hsl(var(--shadow));
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: hsl(var(--muted));
+            color: hsl(var(--foreground));
+        }
+
+        .btn-secondary:hover {
+            background: hsl(var(--muted) / 0.8);
+        }
+
+        .alert {
+            padding: var(--space-md) var(--space-lg);
+            border-radius: var(--radius);
+            font-size: var(--font-size-sm);
+            margin-bottom: var(--space-lg);
+            border-left: 4px solid;
+        }
+
+        .alert-success {
+            background: hsl(142 76% 36% / 0.1);
+            color: hsl(142 76% 36%);
+            border-left-color: hsl(142 76% 36%);
+        }
+
+        .alert-error {
+            background: hsl(var(--destructive) / 0.1);
+            color: hsl(var(--destructive));
+            border-left-color: hsl(var(--destructive));
+        }
+
+        .booking-card {
+            background: hsl(var(--background));
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            box-shadow: 0 4px 16px hsl(220 20% 18% / 0.07);
+            border: 1px solid hsl(var(--border));
+            border-left: 4px solid hsl(var(--primary));
+            margin-bottom: var(--space-lg);
+            transition: all var(--transition-fast);
+        }
+
+        .booking-card:hover {
+            transform: translateX(3px);
+            box-shadow: 0 6px 20px hsl(220 20% 18% / 0.10);
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-nav {
+                flex-direction: column;
+                gap: var(--space-md);
+                padding: var(--space-md);
+            }
+
+            .dashboard-main {
+                padding: var(--space-md);
+            }
+
+            .search-form {
+                grid-template-columns: 1fr;
+                gap: var(--space-md);
+            }
+
+            .parking-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal {
+                margin: var(--space-md);
+                padding: var(--space-lg);
+            }
+
+            .parking-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="dashboard-header">
+        <nav class="dashboard-nav">
+            <a href="index.html" class="dashboard-logo">
+                <div style="width: 2.2rem; height: 2.2rem; background: linear-gradient(135deg, hsl(var(--primary)), hsl(172 38% 36%)); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; color: white; font-size: 1rem; box-shadow: 0 3px 8px hsl(var(--primary) / 0.35);">🅿️</div>
+                <span>ParkHub</span>
+            </a>
+
+            <div class="dashboard-user" style="display: flex; gap: var(--space-md); align-items: center;">
+                <a href="profile.html" class="btn btn-secondary" style="display: flex; align-items: center; gap: var(--space-sm); text-decoration: none; border-radius: var(--radius-full);">
+                    <svg class="icon" style="width: 16px; height: 16px;">
+                        <use href="assets/icons.svg#icon-user"></use>
+                    </svg>
+                    <span id="userName">Loading...</span>
+                </a>
+                <a href="index.html" class="btn" onclick="localStorage.clear()" title="Logout" style="padding: var(--space-sm); background: transparent; color: hsl(var(--destructive));">
+                    <svg class="icon" style="width: 20px; height: 20px;">
+                        <use href="assets/icons.svg#icon-log-out"></use>
+                    </svg>
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="dashboard-main">
+        <!-- Tabs -->
+        <div class="dashboard-tabs">
+            <button class="dashboard-tab active" data-tab="search">
+                <svg class="icon">
+                    <use href="assets/icons.svg#icon-search"></use>
+                </svg>
+                Find Parking
+            </button>
+            <button class="dashboard-tab" data-tab="bookings">
+                <svg class="icon">
+                    <use href="assets/icons.svg#icon-clock"></use>
+                </svg>
+                Active Bookings
+            </button>
+            <button class="dashboard-tab" data-tab="history">
+                <svg class="icon">
+                    <use href="assets/icons.svg#icon-history"></use>
+                </svg>
+                Booking History
+            </button>
+        </div>
+
+        <!-- Search Tab -->
+        <div id="search" class="tab-content active">
+            <section class="search-section">
+                <h1 class="search-title">
+                    <svg class="icon">
+                        <use href="assets/icons.svg#icon-map-pin"></use>
+                    </svg>
+                    Find Parking Spots
+                </h1>
+
+                <form class="search-form" id="searchForm">
+                    <div class="search-input-group">
+                        <label class="search-label" for="searchLocation">Location</label>
+                        <input type="text" id="searchLocation" class="search-input" placeholder="Enter location or area name">
+                    </div>
+                    <div class="search-input-group">
+                        <label class="search-label" for="searchPinCode">PIN Code</label>
+                        <input type="text" id="searchPinCode" class="search-input" placeholder="Enter PIN code">
+                    </div>
+                    <button type="button" class="search-button" id="searchBtn">
+                        <svg class="icon">
+                            <use href="assets/icons.svg#icon-search"></use>
+                        </svg>
+                        Search
+                    </button>
+                </form>
+            </section>
+
+            <section class="results-section">
+                <h2 class="results-title">Available Parking Lots</h2>
+                <div id="parkingLotsContainer" class="parking-grid">
+                    <!-- Parking lots will be rendered here by JavaScript -->
+                </div>
+            </section>
+        </div>
+
+        <!-- Active Bookings Tab -->
+        <div id="bookings" class="tab-content">
+            <section class="search-section">
+                <h1 class="search-title">
+                    <svg class="icon">
+                        <use href="assets/icons.svg#icon-clock"></use>
+                    </svg>
+                    Active Bookings
+                </h1>
+                <div id="activeBookingsContainer">
+                    <div class="empty-state">
+                        <div class="empty-icon">🅿️</div>
+                        <h3>No Active Bookings</h3>
+                        <p>Your active parking bookings will appear here.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- History Tab -->
+        <div id="history" class="tab-content">
+            <section class="search-section">
+                <h1 class="search-title">
+                    <svg class="icon">
+                        <use href="assets/icons.svg#icon-history"></use>
+                    </svg>
+                    Booking History
+                </h1>
+                <div id="historyContainer">
+                    <div class="empty-state">
+                        <div class="empty-icon">📋</div>
+                        <h3>No Booking History</h3>
+                        <p>Your past parking bookings will appear here.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Booking Confirmation Modal -->
+    <div id="bookingModal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">🎯 Confirm Booking</h2>
+                <button class="modal-close" onclick="closeBookingModal()">&times;</button>
+            </div>
+
+            <div class="booking-summary">
+                <h3 class="summary-title">📍 Booking Details</h3>
+                <div class="summary-row">
+                    <span>Parking Lot</span>
+                    <span id="modalLotName" style="font-weight: 600;">-</span>
+                </div>
+                <div class="summary-row">
+                    <span>Location</span>
+                    <span id="modalLotAddress">-</span>
+                </div>
+                <div class="summary-row">
+                    <span>Hourly Rate</span>
+                    <span id="modalHourlyRate" style="font-weight: 600; color: hsl(var(--primary));">-</span>
+                </div>
+                <div class="summary-row">
+                    <span>Available Spots</span>
+                    <span id="modalAvailableSpots">-</span>
+                </div>
+                <div class="summary-row">
+                    <span>⏱️ Estimated Cost</span>
+                    <span id="modalEstimatedCost" style="font-weight: 600;">-</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="modalVehicleNumber">🚗 Your Vehicles</label>
+                <select id="modalVehicleNumber" class="form-select">
+                    <option value="">-- Select vehicle from account --</option>
+                </select>
+                <p id="vehicleHint" style="font-size: var(--font-size-xs); color: hsl(var(--muted-foreground)); margin-top: var(--space-xs); display: none;">No vehicles found. Add one to your profile.</p>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="bookingDuration">⏱️ Booking Duration</label>
+                <select id="bookingDuration" class="form-select" onchange="updatePricingDisplay()">
+                    <option value="1">1 Hour</option>
+                    <option value="2">2 Hours</option>
+                    <option value="3">3 Hours</option>
+                    <option value="4">4 Hours</option>
+                    <option value="6">6 Hours</option>
+                    <option value="8">8 Hours</option>
+                    <option value="12">12 Hours</option>
+                    <option value="24">Full Day (24 Hours)</option>
+                </select>
+                <p id="pricingInfo" style="font-size: var(--font-size-xs); color: hsl(var(--muted-foreground)); margin-top: var(--space-xs);">Pricing calculated automatically</p>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">💳 Payment Method</label>
+                <div class="payment-methods">
+                    <label class="payment-option selected">
+                        <input type="radio" name="payment" value="upi" checked>
+                        <div>
+                            <div style="font-weight: 600;">📱 UPI Payment</div>
+                            <div style="font-size: var(--font-size-xs); color: hsl(var(--muted-foreground));">Google Pay, PhonePe, Paytm</div>
+                        </div>
+                    </label>
+                    <label class="payment-option">
+                        <input type="radio" name="payment" value="wallet">
+                        <div>
+                            <div style="font-weight: 600;">💰 ParkHub Wallet</div>
+                            <div style="font-size: var(--font-size-xs); color: hsl(var(--muted-foreground));">Balance: <span id="modalWalletBalance">₹0.00</span></div>
+                        </div>
+                    </label>
+                    <label class="payment-option">
+                        <input type="radio" name="payment" value="card">
+                        <div>
+                            <div style="font-weight: 600;">💳 Credit/Debit Card</div>
+                            <div style="font-size: var(--font-size-xs); color: hsl(var(--muted-foreground));">Visa, Mastercard, RuPay</div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div id="modalAlert"></div>
+
+            <div style="display: flex; gap: var(--space-md);">
+                <button class="btn btn-secondary" style="flex: 1;" onclick="closeBookingModal()">Cancel</button>
+                <button class="btn btn-primary" style="flex: 1;" id="confirmBookingBtn" onclick="confirmBooking()">
+                    ✓ Confirm & Pay
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Spot Map Modal -->
+    <div id="spotMapModal" class="modal-overlay">
+        <div class="modal" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2 class="modal-title">🅿️ Parking Spot Map</h2>
+                <button class="modal-close" onclick="closeSpotMapModal()">&times;</button>
+            </div>
+            <div id="spotMapContainer" class="spot-grid">
+                <!-- Spots will be rendered here -->
+            </div>
+            <div class="spot-legend">
+                <div class="legend-item">
+                    <div class="legend-color spot-available"></div>
+                    <span>Available (Click to book)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color spot-occupied"></div>
+                    <span>Occupied</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Razorpay Payment Modal -->
+    <div id="razorpayModal" class="modal-overlay">
+        <div class="modal" style="max-width: 380px; padding: 0; overflow: hidden; animation: fadeInUp 0.3s ease-out;">
+            <div style="background: linear-gradient(135deg, hsl(222 84% 15%), hsl(222 84% 10%)); color: white; padding: var(--space-lg) var(--space-xl); text-align: center; position: relative;">
+                <button class="modal-close" style="color: rgba(255,255,255,0.7); position: absolute; top: var(--space-md); right: var(--space-md);" onclick="cancelRazorpayPayment()">&times;</button>
+                <div style="font-weight: 800; font-size: 1.25rem; letter-spacing: 1px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                    <div style="width: 20px; height: 20px; background: #3395FF; border-radius: 4px;"></div>
+                    RAZORPAY
+                </div>
+                <div style="font-size: 0.70rem; opacity: 0.7; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Test Environment</div>
+            </div>
+            <div style="padding: var(--space-xl) var(--space-lg); text-align: center; background: white;">
+                <p style="color: hsl(var(--muted-foreground)); margin-bottom: var(--space-xs); font-size: var(--font-size-sm); font-weight: 500;">Amount Payable to ParkHub</p>
+                <h3 style="font-size: 2.25rem; font-weight: 700; margin-bottom: var(--space-xl); color: hsl(var(--foreground));" id="rzpAmount">₹0.00</h3>
+                
+                <div style="display: flex; flex-direction: column; gap: var(--space-sm);">
+                    <button class="btn" style="background: #F4F4F5; color: #18181B; border: 1px solid #E4E4E7; justify-content: flex-start; padding: 1rem;" onclick="processRazorpaySuccess()" id="rzpUpiBtn">
+                        <span style="font-size: 1.2rem; margin-right: var(--space-sm);">📱</span> Pay via UPI (GPay, PhonePe)
+                    </button>
+                    <button class="btn" style="background: #F4F4F5; color: #18181B; border: 1px solid #E4E4E7; justify-content: flex-start; padding: 1rem;" onclick="processRazorpaySuccess()" id="rzpCardBtn">
+                        <span style="font-size: 1.2rem; margin-right: var(--space-sm);">💳</span> Pay via Credit / Debit Card
+                    </button>
+                </div>
+            </div>
+            <div style="background: #FAFAFA; padding: var(--space-sm); text-align: center; font-size: 0.7rem; color: #A1A1AA; border-top: 1px solid #F4F4F5;">
+                🔒 100% Secured by Razorpay
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Success Modal -->
+    <div id="bookingSuccessModal" class="modal-overlay">
+        <div class="modal" style="text-align: center; max-width: 450px; animation: scaleIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+            <div style="font-size: 4rem; margin-bottom: var(--space-md); animation: fadeInUp 0.5s ease-out 0.2s both;">✅</div>
+            <h2 class="modal-title" style="margin-bottom: var(--space-sm);">Booking Confirmed!</h2>
+            <p style="color: hsl(var(--muted-foreground)); margin-bottom: var(--space-xl);">Your parking spot has been successfully reserved.</p>
+            
+            <div style="background: hsl(var(--muted)); padding: var(--space-lg); border-radius: var(--radius-lg); margin-bottom: var(--space-xl); text-align: left; border: 1px solid hsl(var(--border));">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; border-bottom: 1px dashed hsl(var(--border)); padding-bottom: 0.75rem;">
+                    <span style="color: hsl(var(--muted-foreground)); font-size: var(--font-size-sm);">Booking ID</span>
+                    <strong id="successBookingId" style="font-family: monospace;">-</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; border-bottom: 1px dashed hsl(var(--border)); padding-bottom: 0.75rem;">
+                    <span style="color: hsl(var(--muted-foreground)); font-size: var(--font-size-sm);">Parking Lot</span>
+                    <strong id="successLotName">-</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: hsl(var(--muted-foreground)); font-size: var(--font-size-sm);">Amount Paid</span>
+                    <strong style="color: hsl(var(--primary)); font-size: var(--font-size-lg);" id="successAmount">-</strong>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary btn-block" onclick="closeSuccessModal()">View My Bookings</button>
+        </div>
+    </div>
+    
+    <!-- End Booking Confirm Modal -->
+    <div id="endBookingConfirmModal" class="modal-overlay">
+        <div class="modal" style="text-align: center; max-width: 400px; animation: scaleIn 0.3s ease-out;">
+            <div style="font-size: 3rem; margin-bottom: var(--space-md); animation: fadeInUp 0.4s ease-out;">🛑</div>
+            <h2 class="modal-title" style="margin-bottom: var(--space-sm);">End Parking Session?</h2>
+            <p style="color: hsl(var(--muted-foreground)); margin-bottom: var(--space-xl);">Are you sure you want to end your parking session right now?</p>
+            <div style="display: flex; gap: var(--space-md);">
+                <button class="btn btn-secondary" style="flex: 1;" onclick="cancelReleaseBooking()">Cancel</button>
+                <button class="btn btn-primary" style="flex: 1; background: hsl(var(--destructive)); color: white; border: none;" onclick="confirmReleaseBooking()">Yes, End Now</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/components.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+
+</html>

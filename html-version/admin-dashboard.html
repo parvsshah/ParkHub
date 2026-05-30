@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - ParkHub</title>
+    <meta name="description" content="ParkHub Admin Management System">
+    <link rel="stylesheet" href="styles/global.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <style>
+        body {
+            background: hsl(var(--background));
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(20, 184, 166, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(244, 114, 182, 0.05) 0%, transparent 20%);
+            min-height: 100vh;
+            color: hsl(var(--foreground));
+            padding-bottom: var(--space-3xl);
+        }
+
+        .admin-header {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        }
+
+        .admin-nav {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--space-md) var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .admin-logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            font-size: var(--font-size-lg);
+            font-weight: 800;
+            color: hsl(var(--foreground));
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .admin-logo-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+        }
+
+        .admin-user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+
+        .admin-user-info {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            color: hsl(var(--foreground));
+            font-weight: 600;
+        }
+
+        .admin-badge {
+            background: hsl(var(--destructive) / 0.1);
+            color: hsl(var(--destructive));
+            padding: 2px 8px;
+            border-radius: var(--radius-full);
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .admin-main {
+            max-width: 1400px;
+            margin: var(--space-xl) auto;
+            padding: 0 var(--space-xl);
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .admin-title {
+            font-size: var(--font-size-2xl);
+            font-weight: 800;
+            color: hsl(var(--foreground));
+            margin-bottom: var(--space-xl);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            letter-spacing: -0.5px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: var(--space-lg);
+            margin-bottom: var(--space-2xl);
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+            border-color: rgba(255, 255, 255, 0.8);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-md);
+        }
+
+        .stat-icon {
+            width: 3rem;
+            height: 3rem;
+            background: hsl(var(--primary) / 0.1);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: hsl(var(--primary));
+            font-size: 1.25rem;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: hsl(var(--foreground));
+            margin-bottom: var(--space-xs);
+            letter-spacing: -1px;
+        }
+
+        .stat-label {
+            font-size: var(--font-size-sm);
+            color: hsl(var(--muted-foreground));
+            font-weight: 500;
+        }
+
+        .stat-trend {
+            font-size: 0.75rem;
+            color: hsl(var(--primary));
+            font-weight: 600;
+            background: hsl(var(--primary) / 0.1);
+            padding: 2px 8px;
+            border-radius: var(--radius-sm);
+            display: inline-block;
+            margin-top: var(--space-sm);
+        }
+
+        .admin-tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(12px);
+            border-radius: var(--radius-full);
+            padding: var(--space-xs);
+            margin-bottom: var(--space-xl);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            width: fit-content;
+        }
+
+        .admin-tab {
+            padding: var(--space-sm) var(--space-xl);
+            border: none;
+            background: transparent;
+            border-radius: var(--radius-full);
+            font-weight: 600;
+            color: hsl(var(--muted-foreground));
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-xs);
+        }
+
+        .admin-tab:hover {
+            color: hsl(var(--foreground));
+        }
+
+        .admin-tab.active {
+            background: white;
+            color: hsl(var(--primary));
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeInUp 0.4s ease-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .content-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            margin-bottom: var(--space-xl);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-lg);
+        }
+
+        .card-title {
+            font-size: var(--font-size-lg);
+            font-weight: 700;
+            color: hsl(var(--foreground));
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            border: 1px solid hsl(var(--border));
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: var(--space-md) var(--space-lg);
+            text-align: left;
+            border-bottom: 1px solid hsl(var(--border));
+            font-size: var(--font-size-sm);
+        }
+
+        .data-table th {
+            background: #F8FAFC;
+            font-weight: 600;
+            color: hsl(var(--muted-foreground));
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.75rem;
+        }
+
+        .data-table tr:hover {
+            background: #F1F5F9;
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-badge {
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--radius);
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-semibold);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-available {
+            background: hsl(142 76% 36% / 0.1);
+            color: hsl(142 76% 36%);
+        }
+
+        .status-occupied {
+            background: hsl(var(--destructive) / 0.1);
+            color: hsl(var(--destructive));
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: var(--space-sm);
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: var(--radius);
+            font-size: var(--font-size-xs);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .action-btn.edit {
+            background: hsl(var(--primary) / 0.1);
+            color: hsl(var(--primary));
+        }
+
+        .action-btn.edit:hover {
+            background: hsl(var(--primary));
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .action-btn.delete {
+            background: hsl(var(--destructive) / 0.1);
+            color: hsl(var(--destructive));
+        }
+
+        .action-btn.delete:hover {
+            background: hsl(var(--destructive));
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: var(--space-lg);
+        }
+
+        .report-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .report-title {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-semibold);
+            color: hsl(var(--foreground));
+            margin-bottom: var(--space-md);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .report-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid hsl(var(--border));
+        }
+
+        .report-item:last-child {
+            border-bottom: none;
+        }
+
+        .report-label {
+            color: hsl(var(--muted-foreground));
+            font-size: var(--font-size-sm);
+        }
+
+        .report-value {
+            font-weight: var(--font-weight-semibold);
+            color: hsl(var(--foreground));
+        }
+
+        .report-bar {
+            height: 8px;
+            background: hsl(var(--muted));
+            border-radius: var(--radius);
+            margin-top: var(--space-xs);
+            overflow: hidden;
+        }
+
+        .report-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, hsl(var(--primary)), hsl(var(--accent)));
+            border-radius: var(--radius);
+            transition: width var(--transition-fast);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--space-lg);
+            margin-bottom: var(--space-lg);
+        }
+
+        /* Modal Enhancements */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-lg);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: hsl(var(--background));
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border: 1px solid hsl(var(--border));
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-xl);
+            padding-bottom: var(--space-lg);
+            border-bottom: 1px solid hsl(var(--border));
+        }
+
+        .modal-title {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-bold);
+            color: hsl(var(--foreground));
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: var(--font-size-xl);
+            cursor: pointer;
+            color: hsl(var(--muted-foreground));
+            padding: var(--space-xs);
+            border-radius: var(--radius-sm);
+            transition: all var(--transition-fast);
+        }
+
+        .modal-close:hover {
+            background: hsl(var(--muted));
+            color: hsl(var(--foreground));
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: var(--space-3xl);
+            color: hsl(var(--muted-foreground));
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: var(--space-lg);
+            opacity: 0.5;
+        }
+
+        .empty-title {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--space-sm);
+        }
+
+        .empty-text {
+            font-size: var(--font-size-base);
+        }
+
+        @media (max-width: 768px) {
+            .admin-nav {
+                padding: var(--space-md);
+            }
+
+            .admin-main {
+                padding: var(--space-lg);
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-tabs {
+                flex-direction: column;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .reports-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="admin-header">
+        <nav class="admin-nav">
+            <a href="index.html" class="admin-logo">
+                <div class="admin-logo-icon">🔐</div>
+                <span>ParkHub Admin</span>
+            </a>
+
+            <div class="admin-user">
+                <div class="admin-user-info">
+                    <svg class="icon">
+                        <use href="assets/icons.svg#icon-user"></use>
+                    </svg>
+                    <span id="adminName">Loading...</span>
+                    <div class="admin-badge">Admin</div>
+                </div>
+                <a href="index.html" class="btn btn-outline" onclick="localStorage.clear()">
+                    <svg class="icon">
+                        <use href="assets/icons.svg#icon-log-out"></use>
+                    </svg>
+                    Logout
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="admin-main">
+        <h1 class="admin-title">
+            <svg class="icon">
+                <use href="assets/icons.svg#icon-bar-chart-3"></use>
+            </svg>
+            Admin Dashboard
+        </h1>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">📊</div>
+                </div>
+                <div class="stat-value" id="totalBookings">0</div>
+                <div class="stat-label">Total Bookings</div>
+                <div class="stat-trend">All Time</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">💰</div>
+                </div>
+                <div class="stat-value" id="totalRevenue">₹0</div>
+                <div class="stat-label">Total Revenue</div>
+                <div class="stat-trend">All Time</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">📈</div>
+                </div>
+                <div class="stat-value" id="occupancyRate">0%</div>
+                <div class="stat-label">Occupancy Rate</div>
+                <div class="stat-trend">Current</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">📅</div>
+                </div>
+                <div class="stat-value" id="todayBookings">0</div>
+                <div class="stat-label">Today's Bookings</div>
+                <div class="stat-trend">Last 24 Hours</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="admin-tabs">
+            <button class="admin-tab active" data-tab="overview">
+                <svg class="icon">
+                    <use href="assets/icons.svg#icon-eye"></use>
+                </svg>
+                Overview
+            </button>
+            <button class="admin-tab" data-tab="lots">
+                <svg class="icon">
+                    <use href="assets/icons.svg#icon-map-pin"></use>
+                </svg>
+                Parking Lots
+            </button>
+            <button class="admin-tab" data-tab="reports">
+                <svg class="icon">
+                    <use href="assets/icons.svg#icon-bar-chart-3"></use>
+                </svg>
+                Reports
+            </button>
+            <button class="admin-tab" data-tab="create">
+                <svg class="icon">
+                    <use href="assets/icons.svg#icon-plus"></use>
+                </svg>
+                Create Lot
+            </button>
+        </div>
+
+        <!-- Overview Tab -->
+        <div id="overview" class="tab-content active">
+            <div class="content-card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <svg class="icon">
+                            <use href="assets/icons.svg#icon-clock"></use>
+                        </svg>
+                        Recent Activity
+                    </h2>
+                </div>
+                <div id="recentBookingsContainer">
+                    <div class="empty-state">
+                        <div class="empty-icon">📋</div>
+                        <h3 class="empty-title">No Recent Activity</h3>
+                        <p class="empty-text">Recent bookings and activities will appear here.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Parking Lots Tab -->
+        <div id="lots" class="tab-content">
+            <div class="content-card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <svg class="icon">
+                            <use href="assets/icons.svg#icon-map-pin"></use>
+                        </svg>
+                        All Parking Lots
+                    </h2>
+                    <button class="btn btn-primary" onclick="document.querySelector('[data-tab=create]').click()">
+                        <svg class="icon">
+                            <use href="assets/icons.svg#icon-plus"></use>
+                        </svg>
+                        Add New Lot
+                    </button>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Location</th>
+                                <th>Rate</th>
+                                <th>Total Spots</th>
+                                <th>Available</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lotsTableBody">
+                            <tr>
+                                <td colspan="8" style="text-align: center; padding: var(--space-xl);">
+                                    <div class="empty-state" style="padding: 0;">
+                                        <div class="empty-icon">🅿️</div>
+                                        <h3 class="empty-title">Loading parking lots...</h3>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports Tab -->
+        <div id="reports" class="tab-content">
+            <div class="reports-grid">
+                <!-- Revenue Report -->
+                <div class="report-card">
+                    <h3 class="report-title">
+                        <svg class="icon">
+                            <use href="assets/icons.svg#icon-dollar-sign"></use>
+                        </svg>
+                        Revenue Summary
+                    </h3>
+                    <div id="revenueReport">
+                        <div class="report-item">
+                            <span class="report-label">Today's Revenue</span>
+                            <span class="report-value" id="reportTodayRevenue">₹0</span>
+                        </div>
+                        <div class="report-item">
+                            <span class="report-label">Total Revenue</span>
+                            <span class="report-value" id="reportTotalRevenue">₹0</span>
+                        </div>
+                        <div class="report-item">
+                            <span class="report-label">Avg per Booking</span>
+                            <span class="report-value" id="reportAvgBooking">₹0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Occupancy Report -->
+                <div class="report-card">
+                    <h3 class="report-title">
+                        <svg class="icon">
+                            <use href="assets/icons.svg#icon-trending-up"></use>
+                        </svg>
+                        Occupancy by Lot
+                    </h3>
+                    <div id="occupancyReport">
+                        <div class="empty-state" style="padding: var(--space-lg) 0;">
+                            <div class="empty-icon">📊</div>
+                            <p class="empty-text">Loading occupancy data...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Booking Stats -->
+                <div class="report-card">
+                    <h3 class="report-title">
+                        <svg class="icon">
+                            <use href="assets/icons.svg#icon-calendar"></use>
+                        </svg>
+                        Booking Statistics
+                    </h3>
+                    <div id="bookingStats">
+                        <div class="report-item">
+                            <span class="report-label">Total Bookings</span>
+                            <span class="report-value" id="reportTotalBookings">0</span>
+                        </div>
+                        <div class="report-item">
+                            <span class="report-label">Active Bookings</span>
+                            <span class="report-value" id="reportActiveBookings">0</span>
+                        </div>
+                        <div class="report-item">
+                            <span class="report-label">Completed Today</span>
+                            <span class="report-value" id="reportCompletedToday">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top Performing Lots -->
+                <div class="report-card">
+                    <h3 class="report-title">
+                        <svg class="icon">
+                            <use href="assets/icons.svg#icon-trophy"></use>
+                        </svg>
+                        Top Performing Lots
+                    </h3>
+                    <div id="topLotsReport">
+                        <div class="empty-state" style="padding: var(--space-lg) 0;">
+                            <div class="empty-icon">🏆</div>
+                            <p class="empty-text">Loading performance data...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Create Lot Tab -->
+        <div id="create" class="tab-content">
+            <div class="content-card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <svg class="icon">
+                            <use href="assets/icons.svg#icon-plus-circle"></use>
+                        </svg>
+                        Create New Parking Lot
+                    </h2>
+                </div>
+                <div id="createAlert"></div>
+                <form id="createLotForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label" for="name">Lot Name</label>
+                            <input type="text" id="name" class="form-input" placeholder="Downtown Parking Complex" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="city">City</label>
+                            <input type="text" id="city" class="form-input" placeholder="Mumbai" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="pin_code">PIN Code</label>
+                            <input type="text" id="pin_code" class="form-input" placeholder="400001" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="total_spots">Total Spots</label>
+                            <input type="number" id="total_spots" class="form-input" placeholder="50" min="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="hourly_rate">Hourly Rate (₹)</label>
+                            <input type="number" id="hourly_rate" class="form-input" placeholder="50.00" step="0.01" min="0" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="address">Address</label>
+                        <input type="text" id="address" class="form-input" placeholder="123 Main Street, Near Central Mall" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <svg class="icon">
+                            <use href="assets/icons.svg#icon-plus"></use>
+                        </svg>
+                        Create Parking Lot
+                    </button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Edit Lot Modal -->
+    <div id="editModal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <svg class="icon">
+                        <use href="assets/icons.svg#icon-edit"></use>
+                    </svg>
+                    Edit Parking Lot
+                </h2>
+                <button class="modal-close" onclick="closeEditModal()">&times;</button>
+            </div>
+            <div id="editAlert"></div>
+            <form id="editLotForm">
+                <input type="hidden" id="edit_lot_id">
+                <div class="form-group">
+                    <label class="form-label" for="edit_name">Lot Name</label>
+                    <input type="text" id="edit_name" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="edit_address">Address</label>
+                    <input type="text" id="edit_address" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="edit_city">City</label>
+                    <input type="text" id="edit_city" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="edit_pin_code">PIN Code</label>
+                    <input type="text" id="edit_pin_code" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="edit_hourly_rate">Hourly Rate (₹)</label>
+                    <input type="number" id="edit_hourly_rate" class="form-input" step="0.01" required>
+                </div>
+                <div style="display: flex; gap: var(--space-md); margin-top: var(--space-xl);">
+                    <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="closeEditModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">
+                        <svg class="icon">
+                            <use href="assets/icons.svg#icon-save"></use>
+                        </svg>
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/components.js"></script>
+    <script>
+        const API_BASE_URL = '/api';
+
+        function getAuthToken() {
+            return localStorage.getItem('authToken');
+        }
+
+        function checkAuth() {
+            const token = getAuthToken();
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+            if (!token || user.role !== 'ADMIN') {
+                window.location.href = 'admin-login.html';
+                return false;
+            }
+
+            document.getElementById('adminName').textContent = user.name || 'Admin';
+            return true;
+        }
+
+        async function apiCall(endpoint, options = {}) {
+            const token = getAuthToken();
+            const headers = {
+                'Content-Type': 'application/json',
+                ...options.headers
+            };
+
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+
+            const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+                ...options,
+                headers
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Request failed');
+            }
+
+            return data;
+        }
+
+        async function loadAnalytics() {
+            try {
+                const data = await apiCall('/admin/analytics/overview');
+
+                document.getElementById('totalBookings').textContent = data.total_bookings.all_time.toLocaleString();
+                document.getElementById('totalRevenue').textContent = `₹${data.total_revenue.all_time.toLocaleString()}`;
+                document.getElementById('occupancyRate').textContent = `${data.occupancy_rate.current}%`;
+                document.getElementById('todayBookings').textContent = data.total_bookings.today.toLocaleString();
+
+                // Reports data
+                document.getElementById('reportTodayRevenue').textContent = `₹${data.total_revenue.today.toFixed(2)}`;
+                document.getElementById('reportTotalRevenue').textContent = `₹${data.total_revenue.all_time.toFixed(2)}`;
+                document.getElementById('reportTotalBookings').textContent = data.total_bookings.all_time.toLocaleString();
+                document.getElementById('reportCompletedToday').textContent = data.total_bookings.today.toLocaleString();
+
+                const avgBooking = data.total_bookings.all_time > 0
+                    ? data.total_revenue.all_time / data.total_bookings.all_time
+                    : 0;
+                document.getElementById('reportAvgBooking').textContent = `₹${avgBooking.toFixed(2)}`;
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+            }
+        }
+
+        async function loadParkingLots() {
+            try {
+                const lots = await apiCall('/parking/search');
+                const tbody = document.getElementById('lotsTableBody');
+
+                tbody.innerHTML = lots.map(lot => {
+                    const available = lot.available_spots || 0;
+                    const occupancyPercent = lot.total_spots > 0 ? ((lot.total_spots - available) / lot.total_spots * 100).toFixed(0) : 0;
+                    const statusClass = available > 0 ? 'status-available' : 'status-occupied';
+                    const statusText = available > 0 ? 'Available' : 'Full';
+
+                    return `
+                        <tr>
+                            <td style="font-weight: var(--font-weight-semibold); color: hsl(var(--primary));">#${lot.id}</td>
+                            <td style="font-weight: var(--font-weight-medium);">${lot.name}</td>
+                            <td>${lot.city}, ${lot.pin_code}</td>
+                            <td style="font-weight: var(--font-weight-semibold);">₹${lot.hourly_rate}/hr</td>
+                            <td>${lot.total_spots}</td>
+                            <td style="font-weight: var(--font-weight-semibold); color: ${available > 0 ? 'hsl(142 76% 36%)' : 'hsl(var(--destructive))'};">${available}</td>
+                            <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn edit" onclick='openEditModal(${JSON.stringify(lot)})'>
+                                        <svg class="icon">
+                                            <use href="assets/icons.svg#icon-edit"></use>
+                                        </svg>
+                                        Edit
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+
+                // Occupancy report
+                const occupancyContainer = document.getElementById('occupancyReport');
+                occupancyContainer.innerHTML = lots.slice(0, 4).map(lot => {
+                    const occupancy = lot.total_spots > 0
+                        ? ((lot.total_spots - (lot.available_spots || 0)) / lot.total_spots * 100).toFixed(0)
+                        : 0;
+                    return `
+                        <div style="margin-bottom: var(--space-md);">
+                            <div style="display: flex; justify-content: space-between; font-size: var(--font-size-sm); margin-bottom: var(--space-xs);">
+                                <span style="font-weight: var(--font-weight-medium);">${lot.name.substring(0, 20)}${lot.name.length > 20 ? '...' : ''}</span>
+                                <span style="color: hsl(var(--foreground)); font-weight: var(--font-weight-semibold);">${occupancy}%</span>
+                            </div>
+                            <div class="report-bar">
+                                <div class="report-bar-fill" style="width: ${occupancy}%;"></div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                // Top lots report
+                const topLotsContainer = document.getElementById('topLotsReport');
+                const sortedLots = [...lots].sort((a, b) =>
+                    (b.total_spots - (b.available_spots || 0)) - (a.total_spots - (a.available_spots || 0))
+                );
+                topLotsContainer.innerHTML = sortedLots.slice(0, 3).map((lot, i) => `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-sm) 0; border-bottom: 1px solid hsl(var(--border));">
+                        <div style="display: flex; align-items: center; gap: var(--space-sm);">
+                            <span style="font-size: var(--font-size-lg);">${['🥇', '🥈', '🥉'][i]}</span>
+                            <span style="font-weight: var(--font-weight-medium);">${lot.name.substring(0, 15)}${lot.name.length > 15 ? '...' : ''}</span>
+                        </div>
+                        <span style="font-weight: var(--font-weight-semibold); color: hsl(var(--primary));">${lot.total_spots - (lot.available_spots || 0)} booked</span>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error loading lots:', error);
+                const tbody = document.getElementById('lotsTableBody');
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: var(--space-xl);">
+                            <div class="empty-state" style="padding: 0;">
+                                <div class="empty-icon">⚠️</div>
+                                <h3 class="empty-title">Error Loading Data</h3>
+                                <p class="empty-text">Unable to load parking lots. Please try again.</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        function openEditModal(lot) {
+            document.getElementById('edit_lot_id').value = lot.id;
+            document.getElementById('edit_name').value = lot.name;
+            document.getElementById('edit_address').value = lot.address;
+            document.getElementById('edit_city').value = lot.city;
+            document.getElementById('edit_pin_code').value = lot.pin_code;
+            document.getElementById('edit_hourly_rate').value = lot.hourly_rate;
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+            document.getElementById('editAlert').innerHTML = '';
+        }
+
+        document.getElementById('editLotForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const lotId = document.getElementById('edit_lot_id').value;
+            const formData = {
+                name: document.getElementById('edit_name').value,
+                address: document.getElementById('edit_address').value,
+                city: document.getElementById('edit_city').value,
+                pin_code: document.getElementById('edit_pin_code').value,
+                hourly_rate: parseFloat(document.getElementById('edit_hourly_rate').value)
+            };
+
+            try {
+                await apiCall(`/admin/parking-lots/${lotId}`, {
+                    method: 'PUT',
+                    body: JSON.stringify(formData)
+                });
+
+                closeEditModal();
+                showAlert('Parking lot updated successfully!', 'success');
+                loadParkingLots();
+            } catch (error) {
+                document.getElementById('editAlert').innerHTML = `<div class="alert alert-error">${error.message}</div>`;
+            }
+        });
+
+        document.getElementById('createLotForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = {
+                name: document.getElementById('name').value,
+                address: document.getElementById('address').value,
+                city: document.getElementById('city').value,
+                pin_code: document.getElementById('pin_code').value,
+                total_spots: parseInt(document.getElementById('total_spots').value),
+                hourly_rate: parseFloat(document.getElementById('hourly_rate').value)
+            };
+
+            try {
+                await apiCall('/admin/parking-lots', {
+                    method: 'POST',
+                    body: JSON.stringify(formData)
+                });
+
+                document.getElementById('createAlert').innerHTML = '<div class="alert alert-success">Parking lot created successfully!</div>';
+                document.getElementById('createLotForm').reset();
+
+                setTimeout(() => {
+                    document.querySelector('[data-tab="lots"]').click();
+                    loadParkingLots();
+                }, 1500);
+            } catch (error) {
+                document.getElementById('createAlert').innerHTML = `<div class="alert alert-error">${error.message}</div>`;
+            }
+        });
+
+        function showAlert(message, type = 'error') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            alertDiv.style.position = 'fixed';
+            alertDiv.style.top = '1rem';
+            alertDiv.style.right = '1rem';
+            alertDiv.style.zIndex = '9999';
+            alertDiv.style.maxWidth = '400px';
+
+            document.body.appendChild(alertDiv);
+
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 3000);
+        }
+
+        async function loadRecentBookings() {
+            try {
+                // This would need a new endpoint, for now show placeholder
+                const container = document.getElementById('recentBookingsContainer');
+                container.innerHTML = `
+                    <div class="empty-state" style="padding: var(--space-xl) 0;">
+                        <div class="empty-icon">📋</div>
+                        <h3 class="empty-title">No Recent Activity</h3>
+                        <p class="empty-text">Recent bookings and activities will appear here.</p>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading recent bookings:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!checkAuth()) return;
+
+            loadAnalytics();
+            loadRecentBookings();
+
+            document.querySelector('[data-tab="lots"]').addEventListener('click', loadParkingLots);
+            document.querySelector('[data-tab="reports"]').addEventListener('click', () => {
+                loadAnalytics();
+                loadParkingLots();
+            });
+        });
+    </script>
+</body>
+
+</html>

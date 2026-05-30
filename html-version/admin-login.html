@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - ParkHub</title>
+    <meta name="description" content="ParkHub Admin Portal">
+    <link rel="stylesheet" href="styles/global.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <style>
+        body {
+            background: linear-gradient(145deg, hsl(220 30% 14%) 0%, hsl(220 25% 10%) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow-x: hidden;
+            overflow-y: auto;
+            padding: var(--space-xl) var(--space-lg);
+        }
+
+        .bg-blob { position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; }
+        .blob-1 { width: 500px; height: 500px; background: hsl(172 40% 30%); top: -150px; left: -150px; opacity: 0.25; animation: blobFloat 9s ease-in-out infinite; }
+        .blob-2 { width: 380px; height: 380px; background: hsl(220 40% 25%); bottom: -100px; right: -100px; opacity: 0.3; animation: blobFloat 12s ease-in-out infinite 4s reverse; }
+
+        .back-link {
+            position: absolute;
+            top: var(--space-xl);
+            left: var(--space-xl);
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-xs);
+            color: rgba(255,255,255,0.65);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
+            text-decoration: none;
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--radius);
+            transition: all var(--transition-fast);
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            z-index: 10;
+        }
+
+        .back-link:hover {
+            background: rgba(255,255,255,0.15);
+            color: white;
+        }
+
+        .admin-card {
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(24px);
+            border-radius: var(--radius-xl);
+            padding: var(--space-2xl);
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 32px 80px rgba(0,0,0,0.35), 0 8px 24px rgba(0,0,0,0.20);
+            position: relative;
+            z-index: 1;
+            border: 1px solid rgba(255,255,255,0.6);
+            animation: scaleIn 0.45s var(--transition-spring) both;
+        }
+
+        .admin-header { text-align: center; margin-bottom: var(--space-xl); }
+
+        .admin-logo {
+            width: 4.5rem;
+            height: 4.5rem;
+            background: linear-gradient(135deg, hsl(220 25% 20%), hsl(220 30% 14%));
+            border-radius: var(--radius-xl);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto var(--space-md);
+            font-size: 2rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .admin-logo::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(135deg, hsl(var(--primary)), hsl(172 38% 36%));
+            border-radius: calc(var(--radius-xl) + 2px);
+            z-index: -1;
+        }
+
+        .admin-title {
+            font-size: var(--font-size-2xl);
+            font-weight: var(--font-weight-extrabold);
+            color: hsl(var(--foreground));
+            margin-bottom: var(--space-xs);
+            letter-spacing: -0.02em;
+        }
+
+        .admin-subtitle {
+            color: hsl(var(--muted-foreground));
+            font-size: var(--font-size-sm);
+            margin: 0;
+        }
+
+        .admin-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: hsl(38 90% 54% / 0.12);
+            color: hsl(38 70% 35%);
+            padding: 0.25em 0.75em;
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-bold);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-top: var(--space-sm);
+            border: 1px solid hsl(38 90% 54% / 0.2);
+        }
+
+        .security-notice {
+            background: hsl(38 90% 96%);
+            border: 1px solid hsl(38 90% 80%);
+            border-radius: var(--radius);
+            padding: var(--space-md);
+            margin-bottom: var(--space-lg);
+            font-size: var(--font-size-xs);
+            color: hsl(38 50% 35%);
+            line-height: 1.5;
+        }
+
+        .form-input {
+            background: hsl(var(--background));
+            border: 1.5px solid hsl(var(--border));
+            border-radius: var(--radius);
+            padding: 0.7rem var(--space-md);
+            font-size: var(--font-size-sm);
+            transition: all var(--transition-fast);
+        }
+
+        .form-input:focus {
+            border-color: hsl(var(--primary));
+            box-shadow: 0 0 0 3px hsl(var(--primary) / 0.12);
+            background: white;
+        }
+
+        .demo-section {
+            margin-top: var(--space-lg);
+            padding: var(--space-md) var(--space-lg);
+            background: hsl(var(--muted));
+            border-radius: var(--radius);
+            border: 1px solid hsl(var(--border));
+        }
+
+        .demo-heading {
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-bold);
+            color: hsl(var(--muted-foreground));
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: var(--space-sm);
+        }
+
+        .demo-cred {
+            background: hsl(var(--background));
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--radius-sm);
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.72rem;
+            color: hsl(var(--foreground));
+            margin-bottom: var(--space-xs);
+            border: 1px solid hsl(var(--border));
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .demo-cred:hover { border-color: hsl(var(--primary)); background: hsl(var(--primary-light)); }
+        .demo-cred:last-child { margin-bottom: 0; }
+        .demo-cred strong { color: hsl(var(--primary)); }
+
+        /* Hide native password reveal */
+        input[type="password"]::-ms-reveal,
+        input[type="password"]::-webkit-contacts-auto-fill-button,
+        input[type="password"]::-webkit-credentials-auto-fill-button {
+            display: none !important;
+        }
+
+        @media (max-width: 480px) {
+            .admin-card { padding: var(--space-lg); }
+            .back-link { position: static; display: inline-flex; margin-bottom: var(--space-lg); }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-blob blob-1" style="position: fixed;"></div>
+    <div class="bg-blob blob-2" style="position: fixed;"></div>
+
+    <a href="login.html" class="back-link">
+        <svg class="icon" style="width:1rem;height:1rem;"><use href="assets/icons.svg#icon-arrow-left"></use></svg>
+        User Login
+    </a>
+
+    <div class="admin-card">
+        <div class="admin-header">
+            <div class="admin-logo">🔐</div>
+            <h1 class="admin-title">Admin Portal</h1>
+            <p class="admin-subtitle">ParkHub Management System</p>
+            <div class="admin-badge">⚡ Restricted Access</div>
+        </div>
+
+        <div class="security-notice">
+            <strong>🔒 Security Notice:</strong> This portal is for authorized administrators only. All access attempts are logged and monitored.
+        </div>
+
+        <div id="alert"></div>
+
+        <form id="adminLoginForm">
+            <div class="form-group">
+                <label class="form-label" for="email">Admin Email Address</label>
+                <input type="email" id="email" class="form-input" placeholder="admin@parkhub.com" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="password">Admin Password</label>
+                <input type="password" id="password" class="form-input" placeholder="••••••••••" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg" id="adminLoginBtn">
+                Access Admin Dashboard
+            </button>
+        </form>
+
+        <p style="text-align:center; margin-top:var(--space-md); font-size: var(--font-size-xs); color: hsl(var(--muted-foreground)); margin-bottom: 0;">
+            <a href="login.html" style="color: hsl(var(--muted-foreground));">← Back to user login</a>
+        </p>
+
+        <div class="demo-section">
+            <div class="demo-heading">🔑 Demo Admin Credentials (click to fill)</div>
+            <div class="demo-cred" onclick="document.getElementById('email').value='admin@parkhub.com'; document.getElementById('password').value='admin123456';">
+                <strong>Email:</strong> admin@parkhub.com / admin123456
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = '/api';
+
+        function setLoading(loading) {
+            const btn = document.getElementById('adminLoginBtn');
+            if (loading) {
+                btn.classList.add('btn-loading');
+                btn.disabled = true;
+            } else {
+                btn.classList.remove('btn-loading');
+                btn.disabled = false;
+                btn.textContent = 'Access Admin Dashboard';
+            }
+        }
+
+        document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const alertDiv = document.getElementById('alert');
+            alertDiv.innerHTML = '';
+            setLoading(true);
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Login failed');
+                if (data.user.role !== 'ADMIN') throw new Error('Access denied. Admin credentials required.');
+
+                localStorage.setItem('authToken', data.access_token);
+                localStorage.setItem('user', JSON.stringify(data.user));
+                alertDiv.innerHTML = '<div class="alert alert-success">✓ Admin access granted! Redirecting...</div>';
+                setTimeout(() => { window.location.href = 'admin-dashboard.html'; }, 900);
+            } catch (error) {
+                alertDiv.innerHTML = `<div class="alert alert-error">✗ ${error.message}</div>`;
+            } finally {
+                setLoading(false);
+            }
+        });
+
+        document.getElementById('email').focus();
+    </script>
+</body>
+
+</html>

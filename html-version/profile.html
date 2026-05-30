@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - ParkHub</title>
+    <link rel="stylesheet" href="styles/global.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <style>
+        body {
+            background: linear-gradient(150deg, hsl(172 30% 97%) 0%, hsl(220 20% 96%) 100%);
+            min-height: 100vh;
+        }
+
+        .profile-header {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid hsl(var(--border));
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 0 hsl(var(--border)), 0 4px 20px hsl(220 20% 18% / 0.05);
+        }
+
+        .profile-nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-lg) var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .profile-logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-bold);
+            color: hsl(var(--foreground));
+            text-decoration: none;
+            letter-spacing: -0.02em;
+        }
+
+        .profile-main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-xl);
+        }
+
+        .profile-tabs {
+            display: flex;
+            background: hsl(var(--muted));
+            border-radius: var(--radius-lg);
+            padding: 0.35rem;
+            margin-bottom: var(--space-xl);
+            box-shadow: inset 0 1px 3px hsl(220 20% 18% / 0.06);
+            gap: 0.25rem;
+            flex-wrap: wrap;
+        }
+
+        .profile-tab {
+            padding: 0.65rem var(--space-md);
+            border: none;
+            background: transparent;
+            border-radius: var(--radius);
+            font-weight: var(--font-weight-semibold);
+            font-size: var(--font-size-sm);
+            color: hsl(var(--muted-foreground));
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            white-space: nowrap;
+        }
+
+        .profile-tab:hover {
+            background: hsl(var(--secondary));
+            color: hsl(var(--foreground));
+        }
+
+        .profile-tab.active {
+            background: hsl(var(--background));
+            color: hsl(var(--primary));
+            box-shadow: 0 2px 8px hsl(220 20% 18% / 0.10), 0 1px 3px hsl(220 20% 18% / 0.06);
+            font-weight: var(--font-weight-bold);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: hsl(var(--background));
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            box-shadow: 0 4px 16px hsl(220 20% 18% / 0.07);
+            border: 1px solid hsl(var(--border));
+            margin-bottom: var(--space-lg);
+            transition: all var(--transition-normal);
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 24px hsl(220 20% 18% / 0.10);
+            border-color: hsl(var(--border-hover));
+        }
+
+        .card-title {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-bold);
+            color: hsl(var(--foreground));
+            margin-bottom: var(--space-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-lg);
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-xs);
+        }
+
+        .info-label {
+            font-size: var(--font-size-sm);
+            color: hsl(var(--muted-foreground));
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: var(--font-weight-medium);
+        }
+
+        .info-value {
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-semibold);
+            color: hsl(var(--foreground));
+        }
+
+        .wallet-section {
+            background: linear-gradient(135deg, hsl(172 40% 42%), hsl(172 38% 32%));
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            color: white;
+            margin-bottom: var(--space-xl);
+            box-shadow: 0 12px 36px hsl(172 40% 30% / 0.35), 0 4px 12px hsl(172 40% 30% / 0.20);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wallet-section::before {
+            content: '';
+            position: absolute;
+            top: -40%; right: -20%;
+            width: 300px; height: 300px;
+            background: rgba(255,255,255,0.07);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .wallet-balance {
+            font-size: var(--font-size-sm);
+            opacity: 0.9;
+            margin-bottom: var(--space-md);
+        }
+
+        .wallet-amount {
+            font-size: 3rem;
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--space-lg);
+        }
+
+        .wallet-buttons {
+            display: flex;
+            gap: var(--space-md);
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: var(--space-md) var(--space-lg);
+            border: none;
+            border-radius: var(--radius);
+            font-weight: var(--font-weight-semibold);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .btn-primary {
+            background: hsl(var(--primary));
+            color: hsl(var(--primary-foreground));
+            box-shadow: 0 4px 12px hsl(var(--shadow));
+        }
+
+        .btn-primary:hover {
+            background: hsl(var(--primary-hover));
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: hsl(var(--muted));
+            color: hsl(var(--foreground));
+        }
+
+        .btn-secondary:hover {
+            background: hsl(var(--muted) / 0.8);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: hsl(var(--primary-foreground));
+            border: 2px solid hsl(var(--primary-foreground) / 0.5);
+        }
+
+        .btn-outline:hover {
+            background: hsl(var(--primary-foreground) / 0.1);
+            border-color: hsl(var(--primary-foreground));
+        }
+
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-lg);
+            background: hsl(var(--muted) / 0.5);
+            border-radius: var(--radius);
+            margin-bottom: var(--space-md);
+            border: 1px solid hsl(var(--border));
+        }
+
+        .list-item-content {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-xs);
+        }
+
+        .list-item-title {
+            font-weight: var(--font-weight-semibold);
+            color: hsl(var(--foreground));
+        }
+
+        .list-item-subtitle {
+            font-size: var(--font-size-sm);
+            color: hsl(var(--muted-foreground));
+        }
+
+        .list-item-actions {
+            display: flex;
+            gap: var(--space-sm);
+        }
+
+        .btn-small {
+            padding: var(--space-sm) var(--space-md);
+            font-size: var(--font-size-sm);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: var(--space-3xl);
+            color: hsl(var(--muted-foreground));
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: var(--space-lg);
+            opacity: 0.5;
+        }
+
+        .form-group {
+            margin-bottom: var(--space-lg);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+
+        .form-label {
+            font-weight: var(--font-weight-medium);
+            color: hsl(var(--foreground));
+        }
+
+        .form-input {
+            padding: var(--space-md) var(--space-lg);
+            border: 2px solid hsl(var(--border));
+            border-radius: var(--radius);
+            font-size: var(--font-size-base);
+            background: hsl(var(--background));
+            color: hsl(var(--foreground));
+            font-family: inherit;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: hsl(var(--primary));
+            box-shadow: 0 0 0 3px hsl(var(--primary-light));
+        }
+
+        .btn-group {
+            display: flex;
+            gap: var(--space-md);
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-lg);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: hsl(var(--background));
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border: 1px solid hsl(var(--border));
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-xl);
+            padding-bottom: var(--space-lg);
+            border-bottom: 2px solid hsl(var(--border));
+        }
+
+        .modal-title {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-bold);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: var(--font-size-xl);
+            cursor: pointer;
+            color: hsl(var(--muted-foreground));
+        }
+
+        @media (max-width: 768px) {
+            .profile-main {
+                padding: var(--space-md);
+            }
+
+            .profile-tabs {
+                flex-direction: column;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .wallet-amount {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="profile-header">
+        <nav class="profile-nav">
+            <a href="index.html" class="profile-logo">
+                <div style="width: 2.2rem; height: 2.2rem; background: linear-gradient(135deg, hsl(var(--primary)), hsl(172 38% 36%)); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; color: white; font-size: 1rem; box-shadow: 0 3px 8px hsl(var(--primary) / 0.3);">🅿️</div>
+                <span>ParkHub</span>
+            </a>
+            <div>
+                <a href="dashboard.html" class="btn btn-secondary">← Back to Dashboard</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="profile-main">
+        <!-- Tabs -->
+        <div class="profile-tabs">
+            <button class="profile-tab active" data-tab="account">
+                👤 Account Details
+            </button>
+            <button class="profile-tab" data-tab="vehicles">
+                🚗 My Vehicles
+            </button>
+            <button class="profile-tab" data-tab="cards">
+                💳 Payment Cards
+            </button>
+            <button class="profile-tab" data-tab="wallet">
+                💰 ParkHub Wallet
+            </button>
+        </div>
+
+        <!-- Account Details Tab -->
+        <div id="account" class="tab-content active">
+            <div class="card">
+                <h2 class="card-title">👤 Account Information</h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Full Name</span>
+                        <span class="info-value" id="fullName">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Email Address</span>
+                        <span class="info-value" id="emailAddress">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Phone Number</span>
+                        <span class="info-value" id="phoneNumber">Not Provided</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Account Status</span>
+                        <span class="info-value" style="color: hsl(142 76% 36%);">✓ Active</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">📍 Address Information</h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Address</span>
+                        <span class="info-value" id="addressLine">Not Provided</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">PIN Code</span>
+                        <span class="info-value" id="pinCode">Not Provided</span>
+                    </div>
+                </div>
+                <button class="btn btn-primary" style="margin-top: var(--space-lg);">✏️ Edit Address</button>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">📊 Parking Statistics</h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Total Bookings</span>
+                        <span class="info-value" id="totalBookings">0</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Total Hours Parked</span>
+                        <span class="info-value" id="totalHours">0 hrs</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Amount Spent</span>
+                        <span class="info-value" id="amountSpent">₹0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vehicles Tab -->
+        <div id="vehicles" class="tab-content">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-xl);">
+                    <h2 class="card-title" style="margin: 0;">🚗 My Vehicles</h2>
+                    <button class="btn btn-primary btn-small" onclick="showVehicleForm()">+ Add Vehicle</button>
+                </div>
+                <div id="vehiclesContainer">
+                    <div class="empty-state">
+                        <div class="empty-icon">🚗</div>
+                        <p>No vehicles added yet</p>
+                        <p style="font-size: var(--font-size-sm);">Add your vehicle details to make bookings</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cards Tab -->
+        <div id="cards" class="tab-content">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-xl);">
+                    <h2 class="card-title" style="margin: 0;">💳 Payment Methods</h2>
+                    <button class="btn btn-primary btn-small" onclick="showCardForm()">+ Add Card</button>
+                </div>
+                <div id="cardsContainer">
+                    <div class="empty-state">
+                        <div class="empty-icon">💳</div>
+                        <p>No cards saved yet</p>
+                        <p style="font-size: var(--font-size-sm);">Add a card for faster checkout (Optional)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Wallet Tab -->
+        <div id="wallet" class="tab-content">
+            <div class="wallet-section">
+                <div class="wallet-balance">💰 ParkHub Wallet Balance</div>
+                <div class="wallet-buttons">
+                    <button class="btn btn-outline" onclick="openAddMoney()">💳 Add Money</button>
+                    <button class="btn btn-outline" onclick="document.getElementById('transactionsContainer').scrollIntoView({behavior:'smooth'})">📊 Transaction History</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">💸 How It Works</h2>
+                <div style="display: flex; flex-direction: column; gap: var(--space-lg);">
+                    <div style="display: flex; gap: var(--space-md); align-items: start;">
+                        <div style="font-size: 1.5rem; min-width: 40px; text-align: center;">1️⃣</div>
+                        <div>
+                            <h3 style="font-weight: 600; margin-bottom: var(--space-xs);">Add Money</h3>
+                            <p style="color: hsl(var(--muted-foreground));">Add funds to your ParkHub Wallet via UPI, Credit Card, or Debit Card</p>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: var(--space-md); align-items: start;">
+                        <div style="font-size: 1.5rem; min-width: 40px; text-align: center;">2️⃣</div>
+                        <div>
+                            <h3 style="font-weight: 600; margin-bottom: var(--space-xs);">Make Bookings</h3>
+                            <p style="color: hsl(var(--muted-foreground));">Use wallet balance to pay for parking bookings directly</p>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: var(--space-md); align-items: start;">
+                        <div style="font-size: 1.5rem; min-width: 40px; text-align: center;">3️⃣</div>
+                        <div>
+                            <h3 style="font-weight: 600; margin-bottom: var(--space-xs);">Earn Rewards</h3>
+                            <p style="color: hsl(var(--muted-foreground));">Get 2% cashback on every payment made through wallet</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">📋 Recent Transactions</h2>
+                <div id="transactionsContainer">
+                    <div class="empty-state" style="padding: var(--space-2xl);">
+                        <p>No transactions yet</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_BASE_URL = '/api';
+
+        // Get auth token
+        function getAuthToken() {
+            return localStorage.getItem('authToken');
+        }
+
+        // Check authentication
+        function checkAuth() {
+            if (!getAuthToken()) {
+                window.location.href = 'login.html';
+                return false;
+            }
+            return true;
+        }
+
+        // API call helper
+        async function apiCall(endpoint, options = {}) {
+            const token = getAuthToken();
+            const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                ...options
+            });
+
+            if (!response.ok) {
+                throw new Error('API call failed');
+            }
+
+            return await response.json();
+        }
+
+        // Load user profile
+        async function loadProfile() {
+            try {
+                const profile = await apiCall('/users/me');
+                
+                // Account details
+                document.getElementById('fullName').textContent = profile.name || 'N/A';
+                document.getElementById('emailAddress').textContent = profile.email || 'N/A';
+                document.getElementById('addressLine').textContent = profile.address || 'Not Provided';
+                document.getElementById('pinCode').textContent = profile.pin_code || 'Not Provided';
+                
+                // Stats
+                document.getElementById('totalBookings').textContent = profile.stats?.total_bookings || 0;
+                document.getElementById('totalHours').textContent = `${profile.stats?.total_hours_parked || 0} hrs`;
+                document.getElementById('amountSpent').textContent = `₹${(profile.stats?.total_amount_spent || 0).toFixed(2)}`;
+
+                // Wallet
+                const localBal = localStorage.getItem('walletBalance') || (profile.wallet_balance || 0).toFixed(2);
+                document.getElementById('walletBalance').textContent = `₹${parseFloat(localBal).toFixed(2)}`;
+                
+                // Load vehicles from API
+                try {
+                    const vehicles = await apiCall('/vehicles');
+                    if (vehicles && vehicles.length > 0) {
+                        loadVehicles(vehicles);
+                    }
+                } catch (err) {
+                    console.log('Vehicles endpoint not available yet');
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error);
+            }
+        }
+
+        // Load vehicles
+        function loadVehicles(vehicles) {
+            const container = document.getElementById('vehiclesContainer');
+            if (!vehicles || vehicles.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🚗</div>
+                        <p>No vehicles added yet</p>
+                        <p style="font-size: var(--font-size-sm);">Add your vehicle details to make bookings</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = vehicles.map(vehicle => `
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: var(--space-lg); background: hsl(var(--muted)); border-radius: var(--radius); margin-bottom: var(--space-md);">
+                    <div style="display: flex; align-items: center; gap: var(--space-lg);">
+                        <div style="font-size: 2rem;">🚗</div>
+                        <div>
+                            <div style="font-weight: 600; font-size: var(--font-size-base);">${vehicle.vehicle_number}</div>
+                            <div style="font-size: var(--font-size-sm); color: hsl(var(--muted-foreground));">${vehicle.primary ? '✓ Primary Vehicle' : 'Secondary'}</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: var(--space-sm);">
+                        <button class="btn btn-secondary btn-small" onclick="showEditVehicleForm('${vehicle.vehicle_number}')">Edit</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Show vehicle add/edit form
+        function showVehicleForm(vehicleNumber = null) {
+            const modal = createVehicleModal();
+            const form = modal.querySelector('form');
+            const title = modal.querySelector('.modal-title');
+            
+            if (vehicleNumber) {
+                title.textContent = '✏️ Edit Vehicle';
+                if (form.vehicleNumber) form.vehicleNumber.value = vehicleNumber;
+            } else {
+                title.textContent = '➕ Add New Vehicle';
+                form.reset();
+            }
+            
+            modal.parentElement.classList.add('active');
+        }
+        
+        function showEditVehicleForm(vehicleNumber) {
+            showVehicleForm(vehicleNumber);
+        }
+        
+        // Create vehicle modal
+        function createVehicleModal() {
+            if (document.getElementById('vehicleModal')) return document.getElementById('vehicleModal');
+            
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay';
+            overlay.id = 'vehicleModalOverlay';
+            
+            overlay.innerHTML = `
+                <div class="modal" id="vehicleModal">
+                    <div class="modal-header">
+                        <h2 class="modal-title">Add New Vehicle</h2>
+                        <button class="modal-close" type="button" onclick="closeVehicleModal()">✕</button>
+                    </div>
+                    <form onsubmit="return saveVehicle(event)">
+                        <input type="hidden" name="vehicleId" value="">
+                        <div class="form-group">
+                            <label class="form-label">Vehicle Number *</label>
+                            <input type="text" name="vehicleNumber" class="form-input" placeholder="MH01AB1234" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Vehicle Type</label>
+                            <select name="vehicleType" class="form-input">
+                                <option>Car</option>
+                                <option>Sedan</option>
+                                <option>SUV</option>
+                                <option>Bike</option>
+                                <option>Scooter</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Color</label>
+                            <input type="text" name="color" class="form-input" placeholder="e.g., Silver, Black">
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: center; gap: var(--space-md);">
+                            <input type="checkbox" id="isPrimary" name="isPrimary" style="width: 20px; height: 20px; cursor: pointer;">
+                            <label for="isPrimary" style="cursor: pointer; margin: 0;">Set as primary vehicle</label>
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-secondary" onclick="closeVehicleModal()">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Vehicle</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            document.body.appendChild(overlay);
+            
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) closeVehicleModal();
+            });
+            
+            return document.getElementById('vehicleModal');
+        }
+        
+        function closeVehicleModal() {
+            const overlay = document.getElementById('vehicleModalOverlay');
+            if (overlay) overlay.classList.remove('active');
+        }
+        
+        async function saveVehicle(e) {
+            e.preventDefault();
+            
+            const form = e.target;
+            const vehicleId = form.vehicleId.value;
+            const vehicleData = {
+                vehicle_number: form.vehicleNumber.value.toUpperCase(),
+                vehicle_type: form.vehicleType.value,
+                color: form.color.value,
+                is_primary: form.isPrimary.checked
+            };
+            
+            try {
+                let response;
+                if (vehicleId) {
+                    response = await fetch(`/api/vehicles/${vehicleId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${getAuthToken()}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(vehicleData)
+                    });
+                } else {
+                    response = await fetch('/api/vehicles', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${getAuthToken()}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(vehicleData)
+                    });
+                }
+                
+                if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.error || 'Failed to save vehicle');
+                }
+                
+                // Reload vehicles
+                const vehicles = await apiCall('/vehicles');
+                loadVehicles(vehicles);
+                closeVehicleModal();
+            } catch (error) {
+                alert('❌ ' + error.message);
+            }
+            
+            return false;
+        }
+        
+        async function deleteVehicle(vehicleId) {
+            if (!confirm('Are you sure you want to remove this vehicle?')) return;
+            
+            try {
+                const response = await fetch(`/api/vehicles/${vehicleId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${getAuthToken()}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Failed to delete vehicle');
+                
+                // Reload vehicles
+                const vehicles = await apiCall('/vehicles');
+                loadVehicles(vehicles);
+            } catch (error) {
+                alert('❌ ' + error.message);
+            }
+        }
+
+        // --- Card Modal Logic ---
+        function loadCards() {
+            const container = document.getElementById('cardsContainer');
+            const savedCards = JSON.parse(localStorage.getItem('savedCards') || '[]');
+            
+            if (savedCards.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">💳</div>
+                        <p>No cards saved yet</p>
+                        <p style="font-size: var(--font-size-sm);">Add a card for faster checkout (Optional)</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = savedCards.map((c, i) => `
+                <div class="list-item">
+                    <div class="list-item-content">
+                        <span class="list-item-title">Visa ending in •••• ${c.last4}</span>
+                        <span class="list-item-subtitle">Expires ${c.expiry}</span>
+                    </div>
+                    <div class="list-item-actions">
+                        <button class="btn btn-secondary btn-small" onclick="removeCard(${i})">Remove</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function removeCard(index) {
+            let savedCards = JSON.parse(localStorage.getItem('savedCards') || '[]');
+            savedCards.splice(index, 1);
+            localStorage.setItem('savedCards', JSON.stringify(savedCards));
+            loadCards();
+        }
+
+        function showCardForm() {
+            const modal = createCardModal();
+            modal.parentElement.classList.add('active');
+        }
+
+        function createCardModal() {
+            if (document.getElementById('cardModal')) return document.getElementById('cardModal');
+            
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay';
+            overlay.id = 'cardModalOverlay';
+            
+            overlay.innerHTML = `
+                <div class="modal" id="cardModal">
+                    <div class="modal-header">
+                        <h2 class="modal-title">💳 Add New Card</h2>
+                        <button class="modal-close" type="button" onclick="closeCardModal()">✕</button>
+                    </div>
+                    <form onsubmit="return saveCard(event)">
+                        <div class="form-group">
+                            <label class="form-label">Cardholder Name *</label>
+                            <input type="text" name="cardName" class="form-input" placeholder="John Doe" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Card Number *</label>
+                            <input type="text" name="cardNumber" class="form-input" placeholder="XXXX XXXX XXXX XXXX" maxlength="19" required>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md);">
+                            <div class="form-group">
+                                <label class="form-label">Expiry *</label>
+                                <input type="text" name="cardExpiry" class="form-input" placeholder="MM/YY" maxlength="5" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">CVV *</label>
+                                <input type="password" name="cardCvv" class="form-input" placeholder="•••" maxlength="4" required>
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-secondary" onclick="closeCardModal()">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Card</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            document.body.appendChild(overlay);
+            
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) closeCardModal();
+            });
+            
+            return document.getElementById('cardModal');
+        }
+
+        function closeCardModal() {
+            const overlay = document.getElementById('cardModalOverlay');
+            if (overlay) overlay.classList.remove('active');
+        }
+
+        function saveCard(e) {
+            e.preventDefault();
+            
+            const cardName = e.target.cardName.value;
+            const cardNumber = e.target.cardNumber.value;
+            const cardExpiry = e.target.cardExpiry.value;
+            
+            const last4 = cardNumber.slice(-4) || '1234';
+            
+            let savedCards = JSON.parse(localStorage.getItem('savedCards') || '[]');
+            savedCards.push({ name: cardName, last4, expiry: cardExpiry });
+            localStorage.setItem('savedCards', JSON.stringify(savedCards));
+            
+            alert('✅ Card linked successfully! You can now use it during booking.');
+            loadCards();
+            closeCardModal();
+            return false;
+        }
+
+        // --- Razorpay / Add Money Logic ---
+        function openAddMoney() {
+            const amount = prompt("Enter amount to add to wallet (₹):", "500");
+            if (!amount || isNaN(amount) || parseFloat(amount) <= 0) return;
+            
+            window.pendingAddAmount = parseFloat(amount);
+            
+            // Create or invoke razorpay modal
+            let rzp = document.getElementById('walletRazorpayModal');
+            if (!rzp) {
+                const overlay = document.createElement('div');
+                overlay.className = 'modal-overlay';
+                overlay.id = 'walletRazorpayOverlay';
+                overlay.innerHTML = `
+                    <div class="modal" id="walletRazorpayModal" style="max-width: 380px; padding: 0; overflow: hidden; animation: fadeInUp 0.3s ease-out;">
+                        <div style="background: linear-gradient(135deg, hsl(222 84% 15%), hsl(222 84% 10%)); color: white; padding: var(--space-lg) var(--space-xl); text-align: center; position: relative;">
+                            <button class="modal-close" style="color: rgba(255,255,255,0.7); position: absolute; top: var(--space-md); right: var(--space-md);" onclick="document.getElementById('walletRazorpayOverlay').classList.remove('active')">&times;</button>
+                            <div style="font-weight: 800; font-size: 1.25rem; letter-spacing: 1px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                                <div style="width: 20px; height: 20px; background: #3395FF; border-radius: 4px;"></div>
+                                RAZORPAY
+                            </div>
+                            <div style="font-size: 0.70rem; opacity: 0.7; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Add Money to Wallet</div>
+                        </div>
+                        <div style="padding: var(--space-xl) var(--space-lg); text-align: center; background: white;">
+                            <h3 style="font-size: 2.25rem; font-weight: 700; margin-bottom: var(--space-xl); color: hsl(var(--foreground));" id="rzpWalletAmount">₹0.00</h3>
+                            <div style="display: flex; flex-direction: column; gap: var(--space-sm);">
+                                <button class="btn rzp-btn" style="background: #F4F4F5; color: #18181B; border: 1px solid #E4E4E7; justify-content: flex-start; padding: 1rem;" onclick="processWalletAdd()">
+                                    <span style="font-size: 1.2rem; margin-right: var(--space-sm);">📱</span> Pay via UPI
+                                </button>
+                                <button class="btn rzp-btn" style="background: #F4F4F5; color: #18181B; border: 1px solid #E4E4E7; justify-content: flex-start; padding: 1rem;" onclick="processWalletAdd()">
+                                    <span style="font-size: 1.2rem; margin-right: var(--space-sm);">💳</span> Pay via Card
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(overlay);
+                rzp = document.getElementById('walletRazorpayOverlay');
+            }
+            
+            document.getElementById('rzpWalletAmount').textContent = `₹${window.pendingAddAmount.toFixed(2)}`;
+            rzp.classList.add('active');
+        }
+
+        function processWalletAdd() {
+            const btns = document.querySelectorAll('.rzp-btn');
+            btns.forEach(b => { b.disabled = true; b.style.opacity = '0.7'; });
+            
+            setTimeout(() => {
+                const currentBalText = document.getElementById('walletBalance').textContent;
+                const currentBal = parseFloat(currentBalText.replace('₹', '')) || 0;
+                const newBal = currentBal + window.pendingAddAmount;
+                
+                document.getElementById('walletBalance').textContent = `₹${newBal.toFixed(2)}`;
+                localStorage.setItem('walletBalance', newBal.toFixed(2));
+                
+                // Add simulated transaction
+                let txs = JSON.parse(localStorage.getItem('walletTxs') || '[]');
+                txs.unshift({
+                    id: 'TXN' + Math.floor(Math.random()*1000000),
+                    type: 'credit',
+                    amount: window.pendingAddAmount,
+                    date: new Date().toISOString()
+                });
+                localStorage.setItem('walletTxs', JSON.stringify(txs));
+                
+                document.getElementById('walletRazorpayOverlay').classList.remove('active');
+                btns.forEach(b => { b.disabled = false; b.style.opacity = '1'; });
+                
+                alert(`✅ Successfully added ₹${window.pendingAddAmount.toFixed(2)} to ParkHub Wallet!`);
+                loadTransactions();
+            }, 1500);
+        }
+
+        function loadTransactions() {
+            const container = document.getElementById('transactionsContainer');
+            const txs = JSON.parse(localStorage.getItem('walletTxs') || '[]');
+            
+            if (txs.length === 0) {
+                container.innerHTML = `<div class="empty-state" style="padding: var(--space-2xl);"><p>No transactions yet</p></div>`;
+                return;
+            }
+            
+            container.innerHTML = txs.map(tx => {
+                const date = new Date(tx.date);
+                const isCredit = tx.type === 'credit';
+                return `
+                <div class="list-item" style="border-bottom: 1px solid hsl(var(--border)); padding-bottom: 1rem; margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                        <div>
+                            <div style="font-weight: 600; margin-bottom: 4px;">${isCredit ? 'Added to Wallet' : 'Parking Payment'}</div>
+                            <div style="font-size: var(--font-size-xs); color: hsl(var(--muted-foreground));">${date.toLocaleDateString()} at ${date.toLocaleTimeString()}</div>
+                            <div style="font-size: var(--font-size-xs); color: hsl(var(--muted-foreground)); font-family: monospace;">Ref: ${tx.id}</div>
+                        </div>
+                        <div style="font-weight: 700; font-size: 1.125rem; color: ${isCredit ? 'hsl(142 76% 36%)' : 'hsl(var(--foreground))'};">
+                            ${isCredit ? '+' : '-'}₹${tx.amount.toFixed(2)}
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        // Tab switching
+        document.querySelectorAll('.profile-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.dataset.tab;
+                
+                document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                document.getElementById(tabName).classList.add('active');
+            });
+        });
+
+        // Load wallet balance
+        function loadWalletBalance() {
+            const bal = localStorage.getItem('walletBalance') || '0.00';
+            document.getElementById('walletBalance').textContent = `₹${parseFloat(bal).toFixed(2)}`;
+        }
+        
+        // Initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            if (checkAuth()) {
+                loadProfile();
+                loadCards();
+                loadTransactions();
+                loadWalletBalance();
+            }
+            // Add vehicle button
+            const addVehicleBtn = document.querySelector('[data-tab="vehicles"] .btn-primary');
+            if (addVehicleBtn) {
+                addVehicleBtn.addEventListener('click', () => openVehicleModal());
+            }
+        });
+        if (checkAuth()) {
+            loadProfile();
+        }
+    </script>
+</body>
+</html>

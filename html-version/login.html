@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - ParkHub</title>
+    <meta name="description" content="Sign in to your ParkHub account">
+    <link rel="stylesheet" href="styles/global.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <style>
+        body {
+            background: linear-gradient(145deg, hsl(172 60% 96%) 0%, hsl(200 50% 97%) 50%, hsl(220 40% 96%) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow-x: hidden;
+            overflow-y: auto;
+            padding: var(--space-lg);
+        }
+
+        /* Animated blobs */
+        .bg-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(70px);
+            pointer-events: none;
+        }
+
+        .blob-1 { width: 500px; height: 500px; background: hsl(172 55% 78%); top: -150px; left: -150px; opacity: 0.5; animation: blobFloat 9s ease-in-out infinite; }
+        .blob-2 { width: 380px; height: 380px; background: hsl(200 65% 82%); bottom: -100px; right: -100px; opacity: 0.45; animation: blobFloat 11s ease-in-out infinite 3s reverse; }
+        .blob-3 { width: 250px; height: 250px; background: hsl(40 75% 88%); top: 40%; left: 20%; opacity: 0.35; animation: blobFloat 7s ease-in-out infinite 1.5s; }
+
+        /* Back link */
+        .back-link {
+            position: absolute;
+            top: var(--space-xl);
+            left: var(--space-xl);
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-xs);
+            color: hsl(var(--foreground-secondary));
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
+            text-decoration: none;
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--radius);
+            transition: all var(--transition-fast);
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid hsl(var(--border));
+            z-index: 10;
+        }
+
+        .back-link:hover {
+            background: rgba(255,255,255,0.9);
+            color: hsl(var(--foreground));
+            transform: translateX(-2px);
+        }
+
+        /* Card */
+        .login-card {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-radius: var(--radius-xl);
+            padding: var(--space-2xl);
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 24px 64px hsl(220 20% 18% / 0.12), 0 8px 24px hsl(220 20% 18% / 0.07);
+            position: relative;
+            z-index: 1;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            animation: scaleIn 0.45s var(--transition-spring) both;
+        }
+
+        .login-header { text-align: center; margin-bottom: var(--space-xl); }
+
+        .login-logo {
+            width: 4rem;
+            height: 4rem;
+            background: linear-gradient(135deg, hsl(var(--primary)), hsl(172 38% 36%));
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto var(--space-md);
+            font-size: 1.8rem;
+            color: white;
+            box-shadow: 0 8px 20px hsl(var(--primary) / 0.35);
+        }
+
+        .login-title {
+            font-size: var(--font-size-2xl);
+            font-weight: var(--font-weight-extrabold);
+            background: linear-gradient(135deg, hsl(var(--foreground)), hsl(172 30% 30%));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: var(--space-xs);
+            letter-spacing: -0.02em;
+        }
+
+        .login-subtitle {
+            color: hsl(var(--muted-foreground));
+            font-size: var(--font-size-sm);
+            margin: 0;
+        }
+
+        /* Input wrapper with icon */
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon-left { padding-left: 2.75rem; }
+
+        .input-icon-wrap {
+            position: absolute;
+            left: 0.9rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: hsl(var(--muted-foreground));
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon-wrap.right {
+            left: auto;
+            right: 0.9rem;
+            cursor: pointer;
+            pointer-events: all;
+            color: hsl(var(--muted-foreground));
+            transition: color var(--transition-fast);
+        }
+
+        .input-icon-wrap.right:hover { color: hsl(var(--foreground)); }
+
+        .form-input {
+            background: hsl(var(--background));
+            border: 1.5px solid hsl(var(--border));
+            border-radius: var(--radius);
+            padding: 0.7rem var(--space-md);
+            font-size: var(--font-size-sm);
+            transition: all var(--transition-fast);
+        }
+
+        .form-input:focus {
+            border-color: hsl(var(--primary));
+            box-shadow: 0 0 0 3px hsl(var(--primary) / 0.12);
+            background: white;
+        }
+
+        /* Demo section */
+        .demo-section {
+            margin-top: var(--space-lg);
+            padding: var(--space-md) var(--space-lg);
+            background: hsl(var(--muted));
+            border-radius: var(--radius);
+            border: 1px solid hsl(var(--border));
+        }
+
+        .demo-heading {
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-bold);
+            color: hsl(var(--muted-foreground));
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: var(--space-sm);
+        }
+
+        .demo-cred {
+            background: hsl(var(--background));
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--radius-sm);
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.72rem;
+            color: hsl(var(--foreground));
+            margin-bottom: var(--space-xs);
+            border: 1px solid hsl(var(--border));
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .demo-cred:hover { border-color: hsl(var(--primary)); background: hsl(var(--primary-light)); }
+        .demo-cred:last-child { margin-bottom: 0; }
+        .demo-cred strong { color: hsl(var(--primary)); }
+
+        /* Hide native password reveal */
+        input[type="password"]::-ms-reveal,
+        input[type="password"]::-webkit-contacts-auto-fill-button,
+        input[type="password"]::-webkit-credentials-auto-fill-button {
+            display: none !important;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            margin: var(--space-lg) 0;
+        }
+
+        .divider-line { flex: 1; height: 1px; background: hsl(var(--border)); }
+        .divider-text { font-size: var(--font-size-xs); color: hsl(var(--muted-foreground)); white-space: nowrap; }
+
+        @media (max-width: 480px) {
+            .login-card { padding: var(--space-lg); }
+            .back-link { top: var(--space-md); left: var(--space-md); }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-blob blob-1" style="position: fixed;"></div>
+    <div class="bg-blob blob-2" style="position: fixed;"></div>
+    <div class="bg-blob blob-3" style="position: fixed;"></div>
+
+    <a href="index.html" class="back-link">
+        <svg class="icon" style="width:1rem;height:1rem;"><use href="assets/icons.svg#icon-arrow-left"></use></svg>
+        Back to Home
+    </a>
+
+    <div class="login-card">
+        <div class="login-header">
+            <div class="login-logo">🅿️</div>
+            <h1 class="login-title">Welcome Back</h1>
+            <p class="login-subtitle">Sign in to your ParkHub account</p>
+        </div>
+
+        <div id="alert"></div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label class="form-label" for="email">Email Address</label>
+                <div class="input-wrapper">
+                    <div class="input-icon-wrap">
+                        <svg class="icon" style="width:1rem;height:1rem;"><use href="assets/icons.svg#icon-user"></use></svg>
+                    </div>
+                    <input type="email" id="email" class="form-input input-icon-left" placeholder="user@parkhub.com" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="password">Password</label>
+                <div class="input-wrapper">
+                    <div class="input-icon-wrap">
+                        <svg class="icon" style="width:1rem;height:1rem;"><use href="assets/icons.svg#icon-log-in"></use></svg>
+                    </div>
+                    <input type="password" id="password" class="form-input input-icon-left" placeholder="••••••••" required style="padding-right: 2.75rem;">
+                    <div class="input-icon-wrap right" id="togglePassword" title="Show/hide password">
+                        <svg class="icon" style="width:1.2rem;height:1.2rem;" id="eyeIcon"><use href="assets/icons.svg#icon-eye"></use></svg>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg" id="loginBtn" style="margin-top: var(--space-sm);">
+                <svg class="icon"><use href="assets/icons.svg#icon-log-in"></use></svg>
+                Sign In
+            </button>
+        </form>
+
+        <div class="divider">
+            <span class="divider-line"></span>
+            <span class="divider-text">New to ParkHub?</span>
+            <span class="divider-line"></span>
+        </div>
+
+        <a href="register.html" class="btn btn-secondary btn-block">
+            Create a Free Account
+        </a>
+
+        <p style="text-align:center; margin-top: var(--space-md); margin-bottom: 0; font-size: var(--font-size-xs); color: hsl(var(--muted-foreground));">
+            <a href="admin-login.html" style="color: hsl(var(--muted-foreground));">Admin Login →</a>
+        </p>
+
+        <div class="demo-section">
+            <div class="demo-heading">🔑 Demo Credentials (click to fill)</div>
+            <div class="demo-cred" onclick="fillCredentials('user1@parkhub.com','password123')">
+                <strong>User:</strong> user1@parkhub.com / password123
+            </div>
+            <div class="demo-cred" onclick="fillCredentials('admin@parkhub.com','admin123456')">
+                <strong>Admin:</strong> admin@parkhub.com / admin123456
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = '/api';
+
+        // Click-to-fill demo credentials
+        function fillCredentials(email, password) {
+            document.getElementById('email').value = email;
+            document.getElementById('password').value = password;
+            document.getElementById('email').dispatchEvent(new Event('input'));
+        }
+
+        // Show/hide password
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const pw = document.getElementById('password');
+            pw.type = pw.type === 'password' ? 'text' : 'password';
+        });
+
+        function setLoading(loading) {
+            const btn = document.getElementById('loginBtn');
+            if (loading) {
+                btn.classList.add('btn-loading');
+                btn.disabled = true;
+            } else {
+                btn.classList.remove('btn-loading');
+                btn.disabled = false;
+                btn.innerHTML = `<svg class="icon"><use href="assets/icons.svg#icon-log-in"></use></svg> Sign In`;
+            }
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const alertDiv = document.getElementById('alert');
+            alertDiv.innerHTML = '';
+            setLoading(true);
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const responseText = await response.text();
+                let data;
+                try { data = JSON.parse(responseText); }
+                catch (e) { throw new Error('Invalid server response'); }
+
+                if (!response.ok) throw new Error(data.error || 'Login failed');
+
+                localStorage.setItem('authToken', data.access_token);
+                localStorage.setItem('user', JSON.stringify(data.user));
+                alertDiv.innerHTML = '<div class="alert alert-success">✓ Login successful! Redirecting...</div>';
+
+                setTimeout(() => {
+                    window.location.href = data.user.role === 'ADMIN' ? 'admin-dashboard.html' : 'dashboard.html';
+                }, 900);
+            } catch (error) {
+                alertDiv.innerHTML = `<div class="alert alert-error">✗ ${error.message}</div>`;
+            } finally {
+                setLoading(false);
+            }
+        });
+
+        document.getElementById('email').focus();
+    </script>
+</body>
+
+</html>

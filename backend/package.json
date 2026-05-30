@@ -1,0 +1,20 @@
+{
+    "name": "parkhub-backend",
+    "version": "1.0.0",
+    "description": "ParkHub Backend - Simple Flask API",
+    "scripts": {
+        "dev": "python3 app.py",
+        "start": "python3 app.py",
+        "create-db": "python3 scripts/create_db.py",
+        "setup": "pip3 install -r requirements.txt && python3 scripts/create_db.py && python3 scripts/init_db.py && python3 scripts/seed.py",
+        "seed": "python3 scripts/seed.py",
+        "init-db": "python3 scripts/init_db.py"
+    },
+    "keywords": [
+        "parking",
+        "flask",
+        "python"
+    ],
+    "author": "",
+    "license": "ISC"
+}

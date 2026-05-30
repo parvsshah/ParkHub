@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParkHub - Smart Parking Made Simple</title>
+    <meta name="description" content="Find, book, and manage parking spots effortlessly with ParkHub's intelligent parking platform.">
+    <link rel="stylesheet" href="styles/global.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <style>
+        body { background: hsl(var(--background)); }
+
+        /* ── Hero ── */
+        .hero {
+            position: relative;
+            padding: 5rem 0 4rem;
+            overflow: hidden;
+            background: linear-gradient(145deg, hsl(172 60% 96%) 0%, hsl(200 50% 97%) 40%, hsl(220 40% 96%) 100%);
+        }
+
+        /* Animated blobs */
+        .hero-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.55;
+            pointer-events: none;
+        }
+
+        .blob-1 {
+            width: 520px; height: 520px;
+            background: hsl(172 60% 75%);
+            top: -120px; left: -100px;
+            animation: blobFloat 8s ease-in-out infinite;
+        }
+
+        .blob-2 {
+            width: 400px; height: 400px;
+            background: hsl(200 70% 80%);
+            top: 0; right: -80px;
+            animation: blobFloat 10s ease-in-out infinite 2s reverse;
+        }
+
+        .blob-3 {
+            width: 300px; height: 300px;
+            background: hsl(40 80% 85%);
+            bottom: -60px; left: 40%;
+            animation: blobFloat 7s ease-in-out infinite 1s;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 660px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: hsl(var(--primary) / 0.12);
+            color: hsl(var(--primary));
+            padding: 0.4rem 1rem;
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--space-lg);
+            border: 1px solid hsl(var(--primary) / 0.2);
+            animation: fadeInUp 0.5s ease both;
+        }
+
+        .hero-title {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: var(--font-weight-extrabold);
+            color: hsl(var(--foreground));
+            margin-bottom: var(--space-lg);
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+            animation: fadeInUp 0.5s ease 0.1s both;
+        }
+
+        .hero-title .highlight {
+            background: linear-gradient(135deg, hsl(var(--primary)), hsl(172 50% 35%));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: var(--font-size-lg);
+            color: hsl(var(--foreground-secondary));
+            margin-bottom: var(--space-2xl);
+            line-height: 1.7;
+            animation: fadeInUp 0.5s ease 0.2s both;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: var(--space-md);
+            flex-wrap: wrap;
+            animation: fadeInUp 0.5s ease 0.3s both;
+        }
+
+        .hero-visual {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0.07;
+            font-size: 20rem;
+            pointer-events: none;
+            animation: float 6s ease-in-out infinite;
+            line-height: 1;
+        }
+
+        /* ── Stats Bar ── */
+        .stats-bar {
+            background: hsl(var(--background));
+            border-top: 1px solid hsl(var(--border));
+            border-bottom: 1px solid hsl(var(--border));
+            padding: var(--space-xl) 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-xl);
+            text-align: center;
+        }
+
+        .stat-item { padding: var(--space-md); }
+
+        .stat-number {
+            font-size: var(--font-size-4xl);
+            font-weight: var(--font-weight-extrabold);
+            color: hsl(var(--primary));
+            letter-spacing: -0.03em;
+            line-height: 1;
+            margin-bottom: var(--space-xs);
+        }
+
+        .stat-label {
+            font-size: var(--font-size-sm);
+            color: hsl(var(--muted-foreground));
+            font-weight: var(--font-weight-medium);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        /* ── Features ── */
+        .features {
+            padding: 5rem 0;
+            background: hsl(var(--background-secondary));
+        }
+
+        .section-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: hsl(var(--accent-light));
+            color: hsl(var(--accent));
+            padding: 0.3rem 0.9rem;
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-bold);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: var(--space-md);
+        }
+
+        .section-title {
+            font-size: clamp(1.75rem, 3vw, 2.5rem);
+            font-weight: var(--font-weight-extrabold);
+            color: hsl(var(--foreground));
+            letter-spacing: -0.02em;
+            margin-bottom: var(--space-md);
+        }
+
+        .section-subtitle {
+            font-size: var(--font-size-lg);
+            color: hsl(var(--muted-foreground));
+            max-width: 540px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+            gap: var(--space-xl);
+            margin-top: var(--space-2xl);
+        }
+
+        .feature-card {
+            background: hsl(var(--background));
+            padding: var(--space-xl);
+            border-radius: var(--radius-xl);
+            border: 1px solid hsl(var(--border));
+            transition: all var(--transition-normal);
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(24px);
+        }
+
+        .feature-card.visible {
+            animation: fadeInUp 0.55s ease both;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, hsl(var(--primary)), hsl(172 50% 65%));
+            opacity: 0;
+            transition: opacity var(--transition-normal);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 16px 40px hsl(var(--shadow-md)), 0 4px 12px hsl(var(--shadow));
+            border-color: hsl(var(--border-hover));
+        }
+
+        .feature-card:hover::before { opacity: 1; }
+
+        .feature-icon {
+            width: 3.5rem;
+            height: 3.5rem;
+            background: linear-gradient(135deg, hsl(var(--primary-light)), hsl(172 50% 88%));
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: var(--space-lg);
+            font-size: 1.6rem;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px hsl(var(--primary) / 0.15);
+        }
+
+        .feature-title {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--space-sm);
+            color: hsl(var(--foreground));
+        }
+
+        .feature-description {
+            color: hsl(var(--muted-foreground));
+            line-height: 1.7;
+            font-size: var(--font-size-sm);
+            margin: 0;
+        }
+
+        /* ── How it Works ── */
+        .how-it-works {
+            padding: 5rem 0;
+            background: hsl(var(--background));
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: var(--space-xl);
+            margin-top: var(--space-2xl);
+            position: relative;
+        }
+
+        .step {
+            text-align: center;
+            padding: var(--space-xl);
+        }
+
+        .step-number {
+            width: 3.5rem;
+            height: 3.5rem;
+            background: linear-gradient(135deg, hsl(var(--primary)), hsl(172 38% 36%));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: var(--font-weight-bold);
+            font-size: var(--font-size-lg);
+            margin: 0 auto var(--space-lg);
+            box-shadow: 0 6px 18px hsl(var(--primary) / 0.35);
+        }
+
+        .step-title {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--space-sm);
+        }
+
+        .step-desc { color: hsl(var(--muted-foreground)); font-size: var(--font-size-sm); line-height: 1.7; margin: 0; }
+
+        /* ── Demo Section ── */
+        .demo-section {
+            padding: 5rem 0;
+            background: linear-gradient(135deg, hsl(172 40% 96%), hsl(220 30% 97%));
+        }
+
+        .demo-card {
+            background: hsl(var(--background));
+            border: 1px solid hsl(var(--border));
+            border-radius: var(--radius-xl);
+            padding: var(--space-2xl);
+            text-align: center;
+            max-width: 520px;
+            margin: 0 auto;
+            box-shadow: 0 12px 40px hsl(var(--shadow-md));
+        }
+
+        .demo-title {
+            font-size: var(--font-size-2xl);
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--space-sm);
+            color: hsl(var(--foreground));
+        }
+
+        .demo-credentials {
+            display: grid;
+            gap: var(--space-sm);
+            margin: var(--space-lg) 0;
+        }
+
+        .demo-cred {
+            background: hsl(var(--muted));
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--radius);
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: var(--font-size-sm);
+            color: hsl(var(--foreground));
+            text-align: left;
+            border: 1px solid hsl(var(--border));
+        }
+
+        .demo-cred strong { color: hsl(var(--primary)); }
+
+        /* ── Footer ── */
+        footer {
+            background: hsl(220 20% 14%);
+            color: hsl(220 15% 80%);
+            padding: var(--space-2xl) 0 var(--space-xl);
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            font-weight: var(--font-weight-bold);
+            font-size: var(--font-size-xl);
+            color: white;
+            margin-bottom: var(--space-md);
+        }
+
+        .footer-logo-icon {
+            background: hsl(var(--primary));
+            padding: 0.5rem;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .footer-text { color: hsl(220 10% 60%); font-size: var(--font-size-sm); margin: 0; }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .hero-buttons { flex-direction: column; }
+            .hero-visual { display: none; }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="nav" id="mainNav">
+        <div class="nav-container">
+            <div class="nav-content">
+                <a href="index.html" class="nav-logo">
+                    <div class="nav-logo-icon">
+                        <svg class="icon"><use href="assets/icons.svg#icon-map-pin"></use></svg>
+                    </div>
+                    <span class="nav-logo-text">ParkHub</span>
+                </a>
+                <div class="nav-links">
+                    <a href="#features" class="nav-link">Features</a>
+                    <a href="#how-it-works" class="nav-link">How it Works</a>
+                    <a href="login.html" class="nav-link">Login</a>
+                    <a href="register.html" class="btn btn-primary btn-sm">Get Started</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="blob-1 hero-blob"></div>
+        <div class="blob-2 hero-blob"></div>
+        <div class="blob-3 hero-blob"></div>
+        <div class="hero-visual">🅿️</div>
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    ✨ Smart Parking Platform
+                </div>
+                <h1 class="hero-title">Park Smarter,<br><span class="highlight">Not Harder</span></h1>
+                <p class="hero-subtitle">
+                    Find, book, and manage parking spots effortlessly. Real-time availability, dynamic pricing, and seamless payments — all in one place.
+                </p>
+                <div class="hero-buttons">
+                    <a href="register.html" class="btn btn-primary btn-lg">
+                        <svg class="icon"><use href="assets/icons.svg#icon-user-plus"></use></svg>
+                        Get Started Free
+                    </a>
+                    <a href="login.html" class="btn btn-secondary btn-lg">
+                        <svg class="icon"><use href="assets/icons.svg#icon-log-in"></use></svg>
+                        Sign In
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Bar -->
+    <section class="stats-bar">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item animate-fade-in-up stagger-1">
+                    <div class="stat-number" data-target="10000">0</div>
+                    <div class="stat-label">Active Users</div>
+                </div>
+                <div class="stat-item animate-fade-in-up stagger-2">
+                    <div class="stat-number" data-target="50000">0</div>
+                    <div class="stat-label">Bookings Made</div>
+                </div>
+                <div class="stat-item animate-fade-in-up stagger-3">
+                    <div class="stat-number" data-target="500">0</div>
+                    <div class="stat-label">Parking Lots</div>
+                </div>
+                <div class="stat-item animate-fade-in-up stagger-4">
+                    <div class="stat-number">4.8★</div>
+                    <div class="stat-label">User Rating</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <div class="text-center">
+                <div class="section-tag">✦ Features</div>
+                <h2 class="section-title">Why Choose ParkHub?</h2>
+                <p class="section-subtitle">
+                    Everything you need for stress-free parking, designed for the modern driver.
+                </p>
+            </div>
+
+            <div class="features-grid" id="featuresGrid">
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3 class="feature-title">Real-time Search</h3>
+                    <p class="feature-description">Find available parking spots instantly with our advanced search engine. Filter by location, price, and availability.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3 class="feature-title">Instant Booking</h3>
+                    <p class="feature-description">Book parking spots in seconds. No more circling blocks or waiting in lines — your spot is reserved in a tap.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💰</div>
+                    <h3 class="feature-title">Dynamic Pricing</h3>
+                    <p class="feature-description">Pay fair prices based on demand and time. Save money during off-peak hours and discover the best deals.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3 class="feature-title">Mobile First</h3>
+                    <p class="feature-description">Seamless experience on any device — phones, tablets, or desktops. Park on the go.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🗺️</div>
+                    <h3 class="feature-title">Spot Mapping</h3>
+                    <p class="feature-description">Visualize parking layouts and choose your preferred spot. See real-time availability at a glance.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3 class="feature-title">Analytics Dashboard</h3>
+                    <p class="feature-description">Track your parking history, spending, and preferences. Insights to help you park smarter every time.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works" class="how-it-works">
+        <div class="container">
+            <div class="text-center">
+                <div class="section-tag">✦ Simple Process</div>
+                <h2 class="section-title">Park in 3 Easy Steps</h2>
+                <p class="section-subtitle">From finding to parking, we've made it as simple as possible.</p>
+            </div>
+            <div class="steps-grid">
+                <div class="step animate-fade-in-up stagger-1">
+                    <div class="step-number">1</div>
+                    <h3 class="step-title">Find a Spot</h3>
+                    <p class="step-desc">Search by location or PIN code. See real-time availability and pricing for nearby lots.</p>
+                </div>
+                <div class="step animate-fade-in-up stagger-2">
+                    <div class="step-number">2</div>
+                    <h3 class="step-title">Book Instantly</h3>
+                    <p class="step-desc">Select your preferred spot, choose a payment method, and confirm your booking in seconds.</p>
+                </div>
+                <div class="step animate-fade-in-up stagger-3">
+                    <div class="step-number">3</div>
+                    <h3 class="step-title">Park & Go</h3>
+                    <p class="step-desc">Your spot is guaranteed. Just show up and enjoy a hassle-free parking experience.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo Section -->
+    <section class="demo-section">
+        <div class="container">
+            <div class="demo-card animate-scale-in">
+                <div style="font-size: 3rem; margin-bottom: var(--space-md);">🚀</div>
+                <h3 class="demo-title">Try ParkHub Now</h3>
+                <p class="text-muted mb-3">Use these demo credentials to explore all features:</p>
+
+                <div class="demo-credentials">
+                    <div class="demo-cred">
+                        <strong>User:</strong> user1@parkhub.com / password123
+                    </div>
+                    <div class="demo-cred">
+                        <strong>Admin:</strong> admin@parkhub.com / admin123456
+                    </div>
+                </div>
+
+                <div class="flex gap-3 justify-center">
+                    <a href="login.html" class="btn btn-primary">
+                        <svg class="icon"><use href="assets/icons.svg#icon-log-in"></use></svg>
+                        Login Demo
+                    </a>
+                    <a href="register.html" class="btn btn-secondary">
+                        <svg class="icon"><use href="assets/icons.svg#icon-user-plus"></use></svg>
+                        Create Account
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container text-center">
+            <div class="footer-logo" style="justify-content: center;">
+                <div class="footer-logo-icon">
+                    <svg class="icon"><use href="assets/icons.svg#icon-map-pin"></use></svg>
+                </div>
+                <span>ParkHub</span>
+            </div>
+            <p class="footer-text">© 2025 ParkHub. Smart parking for the modern world.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Navbar scroll effect
+        const nav = document.getElementById('mainNav');
+        window.addEventListener('scroll', () => {
+            nav.classList.toggle('scrolled', window.scrollY > 20);
+        });
+
+        // Animated stat counters
+        function animateCounter(el, target, suffix = '') {
+            let start = 0;
+            const duration = 1800;
+            const step = target / (duration / 16);
+            const format = n => n >= 1000 ? Math.floor(n / 1000) + 'K+' : Math.floor(n) + (n === target ? '+' : '');
+            const timer = setInterval(() => {
+                start = Math.min(start + step, target);
+                el.textContent = format(start) + suffix;
+                if (start >= target) clearInterval(timer);
+            }, 16);
+        }
+
+        // Scroll-reveal for feature cards
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, idx) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    entry.target.style.animationDelay = `${idx * 0.08}s`;
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.12 });
+
+        document.querySelectorAll('.feature-card').forEach(card => observer.observe(card));
+
+        // Stats counter observer
+        const statsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const el = entry.target.querySelector('.stat-number[data-target]');
+                    if (el) {
+                        const target = parseInt(el.getAttribute('data-target'));
+                        animateCounter(el, target);
+                        statsObserver.unobserve(entry.target);
+                    }
+                }
+            });
+        }, { threshold: 0.5 });
+
+        document.querySelectorAll('.stat-item').forEach(item => statsObserver.observe(item));
+    </script>
+</body>
+
+</html>

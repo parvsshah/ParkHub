@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - ParkHub</title>
+    <meta name="description" content="Create your ParkHub account">
+    <link rel="stylesheet" href="styles/global.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <style>
+        body {
+            background: linear-gradient(145deg, hsl(172 60% 96%) 0%, hsl(200 50% 97%) 50%, hsl(220 40% 96%) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow-x: hidden;
+            overflow-y: auto;
+            padding: var(--space-xl) var(--space-lg);
+        }
+
+        .bg-blob { position: absolute; border-radius: 50%; filter: blur(70px); pointer-events: none; }
+        .blob-1 { width: 500px; height: 500px; background: hsl(172 55% 78%); top: -150px; left: -150px; opacity: 0.5; animation: blobFloat 9s ease-in-out infinite; }
+        .blob-2 { width: 380px; height: 380px; background: hsl(200 65% 82%); bottom: -100px; right: -100px; opacity: 0.45; animation: blobFloat 11s ease-in-out infinite 3s reverse; }
+
+        .back-link {
+            position: absolute;
+            top: var(--space-xl);
+            left: var(--space-xl);
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-xs);
+            color: hsl(var(--foreground-secondary));
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
+            text-decoration: none;
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--radius);
+            transition: all var(--transition-fast);
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid hsl(var(--border));
+            z-index: 10;
+        }
+
+        .back-link:hover { background: rgba(255,255,255,0.9); color: hsl(var(--foreground)); transform: translateX(-2px); }
+
+        .register-card {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-radius: var(--radius-xl);
+            padding: var(--space-2xl);
+            max-width: 480px;
+            width: 100%;
+            box-shadow: 0 24px 64px hsl(220 20% 18% / 0.12), 0 8px 24px hsl(220 20% 18% / 0.07);
+            position: relative;
+            z-index: 1;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            animation: scaleIn 0.45s var(--transition-spring) both;
+        }
+
+        .register-header { text-align: center; margin-bottom: var(--space-xl); }
+
+        .register-logo {
+            width: 4rem;
+            height: 4rem;
+            background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto var(--space-md);
+            font-size: 1.8rem;
+            box-shadow: 0 8px 20px hsl(var(--primary) / 0.3);
+        }
+
+        .register-title {
+            font-size: var(--font-size-2xl);
+            font-weight: var(--font-weight-extrabold);
+            background: linear-gradient(135deg, hsl(var(--foreground)), hsl(172 30% 30%));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: var(--space-xs);
+            letter-spacing: -0.02em;
+        }
+
+        .register-subtitle { color: hsl(var(--muted-foreground)); font-size: var(--font-size-sm); margin: 0; }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-md);
+        }
+
+        .form-input {
+            background: hsl(var(--background));
+            border: 1.5px solid hsl(var(--border));
+            border-radius: var(--radius);
+            padding: 0.7rem var(--space-md);
+            font-size: var(--font-size-sm);
+            transition: all var(--transition-fast);
+        }
+
+        .form-input:focus {
+            border-color: hsl(var(--primary));
+            box-shadow: 0 0 0 3px hsl(var(--primary) / 0.12);
+            background: white;
+        }
+
+        .optional-tag {
+            font-size: var(--font-size-xs);
+            color: hsl(var(--muted-foreground));
+            background: hsl(var(--muted));
+            padding: 0.1em 0.5em;
+            border-radius: var(--radius-sm);
+            margin-left: var(--space-xs);
+            font-weight: var(--font-weight-normal);
+        }
+
+        /* Password strength */
+        .strength-bar-wrap { margin-top: var(--space-sm); }
+        .strength-track { height: 5px; background: hsl(var(--border)); border-radius: var(--radius-full); overflow: hidden; margin-bottom: 4px; }
+        .strength-fill { height: 100%; border-radius: var(--radius-full); transition: all 0.4s ease; width: 0; }
+        .strength-text { font-size: var(--font-size-xs); font-weight: var(--font-weight-medium); }
+        .strength-1 { background: hsl(var(--destructive)); }
+        .strength-2 { background: hsl(var(--warning)); }
+        .strength-3 { background: hsl(var(--accent)); }
+        .strength-4 { background: hsl(var(--success)); }
+        .strength-5 { background: hsl(var(--success)); }
+
+        .pw-match { font-size: var(--font-size-xs); margin-top: 4px; font-weight: var(--font-weight-medium); }
+
+        /* Hide native password reveal */
+        input[type="password"]::-ms-reveal,
+        input[type="password"]::-webkit-contacts-auto-fill-button,
+        input[type="password"]::-webkit-credentials-auto-fill-button {
+            display: none !important;
+        }
+
+        @media (max-width: 640px) {
+            .register-card { padding: var(--space-lg); }
+            .form-row { grid-template-columns: 1fr; }
+            .back-link { position: static; display: inline-flex; margin-bottom: var(--space-lg); }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-blob blob-1" style="position: fixed;"></div>
+    <div class="bg-blob blob-2" style="position: fixed;"></div>
+
+    <a href="index.html" class="back-link">
+        <svg class="icon" style="width:1rem;height:1rem;"><use href="assets/icons.svg#icon-arrow-left"></use></svg>
+        Back to Home
+    </a>
+
+    <div class="register-card">
+        <div class="register-header">
+            <div class="register-logo">✨</div>
+            <h1 class="register-title">Join ParkHub</h1>
+            <p class="register-subtitle">Create your account and start parking smarter</p>
+        </div>
+
+        <div id="alert"></div>
+
+        <form id="registerForm">
+            <div class="form-group">
+                <label class="form-label" for="name">Full Name</label>
+                <input type="text" id="name" class="form-input" placeholder="Enter your full name" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="email">Email Address</label>
+                <input type="email" id="email" class="form-input" placeholder="your@email.com" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="password">Password</label>
+                <input type="password" id="password" class="form-input" placeholder="Create a strong password" required>
+                <div class="strength-bar-wrap">
+                    <div class="strength-track"><div class="strength-fill" id="strengthFill"></div></div>
+                    <div class="strength-text" id="strengthText" style="color: hsl(var(--muted-foreground));">Password strength</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" class="form-input" placeholder="Re-enter your password" required>
+                <div class="pw-match" id="passwordMatch"></div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="address">
+                    Address <span class="optional-tag">optional</span>
+                </label>
+                <input type="text" id="address" class="form-input" placeholder="Your address">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="pin_code">PIN Code <span class="optional-tag">optional</span></label>
+                    <input type="text" id="pin_code" class="form-input" placeholder="400001">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="vehicle_number">Vehicle No. <span class="optional-tag">optional</span></label>
+                    <input type="text" id="vehicle_number" class="form-input" placeholder="MH01AB1234">
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg" id="registerBtn">
+                <svg class="icon"><use href="assets/icons.svg#icon-user-plus"></use></svg>
+                Create Account
+            </button>
+        </form>
+
+        <p style="text-align:center; margin-top: var(--space-lg); font-size: var(--font-size-sm); color: hsl(var(--muted-foreground)); margin-bottom: 0;">
+            Already have an account?
+            <a href="login.html">Sign in instead</a>
+        </p>
+    </div>
+
+    <script>
+        const API_BASE_URL = '/api';
+
+        // Password strength
+        function checkStrength(pw) {
+            let s = 0;
+            if (pw.length >= 8) s++;
+            if (/[a-z]/.test(pw)) s++;
+            if (/[A-Z]/.test(pw)) s++;
+            if (/[0-9]/.test(pw)) s++;
+            if (/[^A-Za-z0-9]/.test(pw)) s++;
+            return s;
+        }
+
+        document.getElementById('password').addEventListener('input', function() {
+            const pw = this.value;
+            const fill = document.getElementById('strengthFill');
+            const text = document.getElementById('strengthText');
+            if (!pw) { fill.style.width = '0'; text.textContent = 'Password strength'; return; }
+            const s = checkStrength(pw);
+            const labels = ['', 'Weak', 'Fair', 'Good', 'Strong', 'Very Strong'];
+            const colors = ['', 'hsl(var(--destructive))', 'hsl(var(--warning))', 'hsl(var(--accent))', 'hsl(var(--success))', 'hsl(var(--success))'];
+            fill.style.width = (s * 20) + '%';
+            fill.className = `strength-fill strength-${s}`;
+            text.textContent = labels[s];
+            text.style.color = colors[s];
+        });
+
+        function checkMatch() {
+            const pw = document.getElementById('password').value;
+            const cpw = document.getElementById('confirmPassword').value;
+            const el = document.getElementById('passwordMatch');
+            if (!cpw) { el.textContent = ''; return true; }
+            if (pw === cpw) {
+                el.textContent = '✓ Passwords match';
+                el.style.color = 'hsl(var(--success))';
+                return true;
+            } else {
+                el.textContent = '✗ Passwords do not match';
+                el.style.color = 'hsl(var(--destructive))';
+                return false;
+            }
+        }
+
+        document.getElementById('password').addEventListener('input', checkMatch);
+        document.getElementById('confirmPassword').addEventListener('input', checkMatch);
+
+        function setLoading(loading) {
+            const btn = document.getElementById('registerBtn');
+            if (loading) {
+                btn.classList.add('btn-loading');
+                btn.disabled = true;
+            } else {
+                btn.classList.remove('btn-loading');
+                btn.disabled = false;
+                btn.innerHTML = `<svg class="icon"><use href="assets/icons.svg#icon-user-plus"></use></svg> Create Account`;
+            }
+        }
+
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const alertDiv = document.getElementById('alert');
+            alertDiv.innerHTML = '';
+
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const vehicleNumber = document.getElementById('vehicle_number').value.trim();
+            const pinCode = document.getElementById('pin_code').value.trim();
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+
+            if (!name || name.length < 2) { alertDiv.innerHTML = '<div class="alert alert-error">Please enter your full name (at least 2 characters)</div>'; return; }
+            if (!email || !email.includes('@')) { alertDiv.innerHTML = '<div class="alert alert-error">Please enter a valid email address</div>'; return; }
+            if (password.length < 8) { alertDiv.innerHTML = '<div class="alert alert-error">Password must be at least 8 characters</div>'; return; }
+            if (password !== confirmPassword) { alertDiv.innerHTML = '<div class="alert alert-error">Passwords do not match</div>'; return; }
+            if (pinCode && !/^\d{5,10}$/.test(pinCode)) { alertDiv.innerHTML = '<div class="alert alert-error">Please enter a valid PIN code (5-10 digits)</div>'; return; }
+            if (vehicleNumber && vehicleNumber.length < 3) { alertDiv.innerHTML = '<div class="alert alert-error">Please enter a valid vehicle number</div>'; return; }
+
+            setLoading(true);
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name, email, password,
+                        address: document.getElementById('address').value.trim() || null,
+                        pin_code: pinCode || null,
+                        vehicle_number: vehicleNumber || null
+                    })
+                });
+
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Registration failed');
+
+                localStorage.setItem('authToken', data.access_token);
+                localStorage.setItem('user', JSON.stringify(data.user));
+                alertDiv.innerHTML = '<div class="alert alert-success">✓ Account created! Redirecting to dashboard...</div>';
+                setTimeout(() => { window.location.href = 'dashboard.html'; }, 1200);
+            } catch (error) {
+                alertDiv.innerHTML = `<div class="alert alert-error">✗ ${error.message}</div>`;
+            } finally {
+                setLoading(false);
+            }
+        });
+
+        document.getElementById('name').focus();
+    </script>
+</body>
+
+</html>

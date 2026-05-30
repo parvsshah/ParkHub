@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Confirmation - ParkHub</title>
+    <link rel="stylesheet" href="styles/global.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--muted)) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-lg);
+        }
+
+        .confirmation-container {
+            background: hsl(var(--background));
+            border-radius: var(--radius-lg);
+            padding: var(--space-3xl);
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            border: 1px solid hsl(var(--border));
+            text-align: center;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            margin-bottom: var(--space-lg);
+            animation: bounce 0.6s ease-out;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .confirmation-title {
+            font-size: var(--font-size-3xl);
+            font-weight: var(--font-weight-bold);
+            color: hsl(142 76% 36%);
+            margin-bottom: var(--space-md);
+        }
+
+        .confirmation-subtitle {
+            font-size: var(--font-size-lg);
+            color: hsl(var(--muted-foreground));
+            margin-bottom: var(--space-xl);
+        }
+
+        .confirmation-details {
+            background: linear-gradient(135deg, hsl(var(--muted)), hsl(var(--secondary)));
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-xl);
+            border: 2px solid hsl(var(--border));
+            text-align: left;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--space-md) 0;
+            border-bottom: 1px solid hsl(var(--border));
+            font-size: var(--font-size-base);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: hsl(var(--muted-foreground));
+            font-weight: var(--font-weight-medium);
+        }
+
+        .detail-value {
+            font-weight: var(--font-weight-bold);
+            color: hsl(var(--foreground));
+        }
+
+        .total-cost {
+            background: hsl(var(--primary) / 0.1);
+            border: 2px solid hsl(var(--primary));
+            border-radius: var(--radius);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+
+        .total-cost-label {
+            font-size: var(--font-size-sm);
+            color: hsl(var(--muted-foreground));
+            margin-bottom: var(--space-sm);
+        }
+
+        .total-cost-value {
+            font-size: 2.5rem;
+            font-weight: var(--font-weight-bold);
+            color: hsl(var(--primary));
+        }
+
+        .booking-number {
+            font-size: var(--font-size-sm);
+            color: hsl(var(--muted-foreground));
+            font-family: monospace;
+            margin-top: var(--space-md);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: var(--space-md);
+            margin-top: var(--space-xl);
+        }
+
+        .btn {
+            flex: 1;
+            padding: var(--space-md) var(--space-lg);
+            border: none;
+            border-radius: var(--radius);
+            font-weight: var(--font-weight-semibold);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-size: var(--font-size-base);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-sm);
+        }
+
+        .btn-primary {
+            background: hsl(var(--primary));
+            color: hsl(var(--primary-foreground));
+            box-shadow: 0 4px 12px hsl(var(--shadow));
+        }
+
+        .btn-primary:hover {
+            background: hsl(var(--primary-hover));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px hsl(var(--shadow));
+        }
+
+        .btn-secondary {
+            background: hsl(var(--muted));
+            color: hsl(var(--foreground));
+            border: 2px solid hsl(var(--border));
+        }
+
+        .btn-secondary:hover {
+            background: hsl(var(--muted) / 0.8);
+        }
+
+        .status-badge {
+            display: inline-block;
+            background: hsl(142 76% 36% / 0.1);
+            color: hsl(142 76% 36%);
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: var(--radius-lg);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--space-lg);
+        }
+
+        .confirmation-message {
+            background: hsl(142 76% 36% / 0.08);
+            border-left: 4px solid hsl(142 76% 36%);
+            padding: var(--space-lg);
+            border-radius: var(--radius);
+            margin-bottom: var(--space-xl);
+            color: hsl(var(--foreground));
+            line-height: 1.6;
+        }
+
+        @media (max-width: 640px) {
+            .confirmation-container {
+                padding: var(--space-xl);
+            }
+
+            .confirmation-title {
+                font-size: var(--font-size-2xl);
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="confirmation-container">
+        <div class="success-icon">✅</div>
+        
+        <h1 class="confirmation-title">Booking Confirmed!</h1>
+        <p class="confirmation-subtitle">Your parking spot has been booked successfully</p>
+        
+        <div class="status-badge">✓ Active Booking</div>
+        
+        <div class="confirmation-details" id="confirmationDetails">
+            <!-- Details will be populated by JavaScript -->
+        </div>
+        
+        <div class="total-cost">
+            <div class="total-cost-label">Total Estimated Cost</div>
+            <div class="total-cost-value" id="totalCostValue">₹0</div>
+        </div>
+        
+        <div class="confirmation-message">
+            📍 Your booking is now active. You can view it in "Active Bookings" tab. Don't forget to end your booking when you leave!
+        </div>
+        
+        <div id="bookingNumber" class="booking-number"></div>
+        
+        <div class="action-buttons">
+            <a href="dashboard.html" class="btn btn-secondary">
+                👁️ View Bookings
+            </a>
+            <a href="dashboard.html?tab=search" class="btn btn-primary">
+                🔍 Search More
+            </a>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = '/api';
+
+        // Get booking ID from URL
+        const bookingId = new URLSearchParams(window.location.search).get('id');
+        
+        async function loadBookingDetails() {
+            try {
+                if (!bookingId) {
+                    console.error('No booking ID provided');
+                    return;
+                }
+
+                const token = localStorage.getItem('authToken');
+                const response = await fetch(`${API_BASE_URL}/bookings/${bookingId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load booking details');
+                }
+
+                const booking = await response.json();
+                displayConfirmation(booking);
+            } catch (error) {
+                console.error('Error loading booking:', error);
+                document.getElementById('confirmationDetails').innerHTML = `
+                    <div style="color: hsl(var(--destructive)); text-align: center;">
+                        Error loading booking details
+                    </div>
+                `;
+            }
+        }
+
+        function displayConfirmation(booking) {
+            const startTime = new Date(booking.start_time);
+            const endTime = booking.end_time ? new Date(booking.end_time) : null;
+            const duration = booking.duration_hours || 1;
+            const hourlyRate = booking.hourly_rate || 0;
+            const totalCost = duration * hourlyRate;
+
+            const detailsHTML = `
+                <div class="detail-row">
+                    <span class="detail-label">🅿️ Parking Lot</span>
+                    <span class="detail-value">${booking.lot_name || 'Lot ' + booking.lot_id}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">🅿️ Spot Number</span>
+                    <span class="detail-value">${booking.spot_id}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">📍 Location</span>
+                    <span class="detail-value">${booking.location || 'Unknown'}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">🚗 Vehicle</span>
+                    <span class="detail-value">${booking.vehicle_number}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">📅 Started</span>
+                    <span class="detail-value">${startTime.toLocaleString()}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">⏱️ Duration</span>
+                    <span class="detail-value">${duration} hour${duration > 1 ? 's' : ''}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">💰 Rate</span>
+                    <span class="detail-value">₹${hourlyRate}/hour</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">💳 Payment Method</span>
+                    <span class="detail-value">${booking.payment_method === 'upi' ? '📱 UPI' : '💳 Card'}</span>
+                </div>
+            `;
+
+            document.getElementById('confirmationDetails').innerHTML = detailsHTML;
+            document.getElementById('totalCostValue').textContent = `₹${totalCost.toFixed(2)}`;
+            document.getElementById('bookingNumber').innerHTML = `<strong>Booking ID:</strong> #${booking.id}`;
+        }
+
+        // Load details when page loads
+        window.addEventListener('load', loadBookingDetails);
+    </script>
+</body>
+</html>
